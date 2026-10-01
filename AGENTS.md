@@ -7,8 +7,8 @@ Este proyecto contiene dos repositorios:
 
 Antes de implementar una funcionalidad:
 
-1. Revisar la documentación correspondiente en `../docs/`.
+1. Revisar la documentación correspondiente en `../Docs/`.
 2. Seguir los requisitos y decisiones arquitectónicas documentadas.
 3. Si existe una contradicción entre la documentación y el código, informar antes de modificar el comportamiento.
 
-Las modificaciones de código deben realizarse únicamente en `app/`, salvo que se solicite explícitamente modificar `docs/`.
+Las modificaciones de código deben realizarse únicamente en `App/`, salvo que se solicite explícitamente modificar `Docs/`.
