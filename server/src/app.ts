@@ -18,8 +18,8 @@ export function crearApp(boss: PgBoss): express.Express {
   app.use('/uploads', express.static(path.resolve(config.UPLOAD_DIR)));
 
   const api = express.Router();
-  api.use(rutasAuth);
-  api.use(rutasEventos);
+  api.use('/auth', rutasAuth);
+  api.use('/eventos', rutasEventos);
   api.use(rutasDeudas);
   api.use(crearRutasComprobantes(boss));
   app.use('/api/v1', api);

@@ -22,7 +22,7 @@ La documentación oficial vive en [`../Docs/`](../Docs/).
 ```bash
 npm install                # instala dependencias y genera el cliente Prisma (postinstall)
 cp .env.example server/.env   # Windows: copy .env.example server\.env
-npm run db:up              # levanta PostgreSQL 16 en el puerto 5432
+npm run db:up              # levanta PostgreSQL 16 en el puerto 5433
 npm run setup              # prisma generate + db push + seed
 npm run dev                # API (:3000) + worker OCR + web (:5173)
 ```

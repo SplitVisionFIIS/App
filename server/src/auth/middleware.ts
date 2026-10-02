@@ -1,4 +1,4 @@
-import { sign, verify, type JwtPayload, type SignOptions } from 'jsonwebtoken';
+import jwt, { type JwtPayload, type SignOptions } from 'jsonwebtoken';
 import { config } from '../config';
 import { AppError } from '../errors';
 import { asyncHandler } from '../http';
@@ -9,14 +9,14 @@ export interface UsuarioToken {
 }
 
 export function firmarToken(usuario: UsuarioToken): string {
-  return sign({ sub: usuario.id, username: usuario.username }, config.JWT_SECRET, {
+  return jwt.sign({ sub: usuario.id, username: usuario.username }, config.JWT_SECRET, {
     expiresIn: config.JWT_EXPIRA as SignOptions['expiresIn'],
   });
 }
 
 export function verificarToken(token: string): UsuarioToken {
   try {
-    const payload = verify(token, config.JWT_SECRET) as JwtPayload;
+    const payload = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
     if (typeof payload.sub !== 'string' || typeof payload.username !== 'string') {
       throw new Error('payload invalido');
     }

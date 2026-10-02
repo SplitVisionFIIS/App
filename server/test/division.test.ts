@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ContractViolation,
   deudasDesdePartes,
   repartoEquitativo,
   repartoPorItems,
   verificarInvariante,
 } from '../src/division/engine';
+import { ContractViolation } from '../src/division/contratos';
 
 describe('RF4 - Motor de division (Design by Contract)', () => {
   it('reparto equitativo de S/ 100.00 entre 3 cuadra exacto (33.34 / 33.33 / 33.33)', () => {

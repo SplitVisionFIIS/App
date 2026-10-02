@@ -36,6 +36,9 @@ model Usuario {
   pagos           Pago[]
   itemConsumos    ItemConsumo[]
 
+  deudasComoAcreedor Deuda[] @relation("DeudaAcreedor")
+  deudasComoDeudor   Deuda[] @relation("DeudaDeudor")
+
   @@map("usuarios")
 }
 

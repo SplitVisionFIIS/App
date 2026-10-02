@@ -1,0 +1,31 @@
+0000	4e 4f 44 45 5f 45 4e 56  3d 64 65 76 65 6c 6f 70   NODE_ENV=develop
+0010	6d 65 6e 74 0d 0a 50 4f  52 54 3d 33 30 30 30 0d   ment..PORT=3000.
+0020	0a 44 41 54 41 42 41 53  45 5f 55 52 4c 3d 70 6f   .DATABASE_URL=po
+0030	73 74 67 72 65 73 71 6c  3a 2f 2f 73 70 6c 69 74   stgresql://split
+0040	76 69 73 69 6f 6e 3a 73  70 6c 69 74 76 69 73 69   vision:splitvisi
+0050	6f 6e 40 6c 6f 63 61 6c  68 6f 73 74 3a 35 34 33   on@localhost:543
+0060	32 2f 73 70 6c 69 74 76  69 73 69 6f 6e 3f 73 63   2/splitvision?sc
+0070	68 65 6d 61 3d 70 75 62  6c 69 63 0d 0a 4a 57 54   hema=public..JWT
+0080	5f 53 45 43 52 45 54 3d  63 61 6d 62 69 61 2d 65   _SECRET=cambia-e
+0090	73 74 65 2d 73 65 63 72  65 74 6f 2d 6c 61 72 67   ste-secreto-larg
+00a0	6f 2d 65 6e 2d 70 72 6f  64 75 63 63 69 6f 6e 2d   o-en-produccion-
+00b0	30 31 32 33 34 35 36 37  38 39 0d 0a 4a 57 54 5f   0123456789..JWT_
+00c0	45 58 50 49 52 41 3d 31  32 68 0d 0a 57 45 42 5f   EXPIRA=12h..WEB_
+00d0	4f 52 49 47 49 4e 3d 68  74 74 70 3a 2f 2f 6c 6f   ORIGIN=http://lo
+00e0	63 61 6c 68 6f 73 74 3a  35 31 37 33 0d 0a 55 50   calhost:5173..UP
+00f0	4c 4f 41 44 5f 44 49 52  3d 75 70 6c 6f 61 64 73   LOAD_DIR=uploads
+0100	0d 0a 4c 4f 47 5f 4c 45  56 45 4c 3d 69 6e 66 6f   ..LOG_LEVEL=info
+0110	0d 0a 0d 0a 23 20 4f 43  52 3a 20 6d 6f 63 6b 20   ....# OCR: mock 
+0120	28 64 65 74 65 72 6d 69  6e 69 73 74 69 63 6f 20   (deterministico 
+0130	70 61 72 61 20 64 65 6d  6f 2f 74 65 73 74 73 29   para demo/tests)
+0140	20 7c 20 74 65 73 73 65  72 61 63 74 20 28 67 72    | tesseract (gr
+0150	61 74 75 69 74 6f 2c 20  73 69 6e 20 41 50 49 20   atuito, sin API 
+0160	6b 65 79 29 0d 0a 4f 43  52 5f 50 52 4f 56 49 44   key)..OCR_PROVID
+0170	45 52 3d 6d 6f 63 6b 0d  0a 4f 43 52 5f 54 49 4d   ER=mock..OCR_TIM
+0180	45 4f 55 54 5f 4d 53 3d  33 30 30 30 30 0d 0a 4f   EOUT_MS=30000..O
+0190	43 52 5f 4d 41 58 5f 52  45 54 52 49 45 53 3d 32   CR_MAX_RETRIES=2
+01a0	0d 0a 4f 43 52 5f 4d 4f  43 4b 5f 44 45 4c 41 59   ..OCR_MOCK_DELAY
+01b0	5f 4d 53 3d 35 30 30 0d  0a 4f 43 52 5f 4d 4f 43   _MS=500..OCR_MOC
+01c0	4b 5f 45 52 52 4f 52 5f  52 41 54 45 3d 30 0d 0a   K_ERROR_RATE=0..
+01d0	54 45 53 53 45 52 41 43  54 5f 4c 41 4e 47 3d 73   TESSERACT_LANG=s
+01e0	70 61 2b 65 6e 67 0d 0a                            pa+eng..

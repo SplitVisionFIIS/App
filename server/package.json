@@ -12,12 +12,12 @@
     "db:push": "prisma db push",
     "seed": "prisma db seed",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
-  "postinstall": "prisma generate",
   "dependencies": {
     "@prisma/client": "^6.2.1",
     "@splitvision/shared": "*",
