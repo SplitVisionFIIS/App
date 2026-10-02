@@ -1,0 +1,22 @@
+{
+  "name": "splitvision",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,worker,web -c blue,magenta,green \"npm run dev -w server\" \"npm run worker -w server\" \"npm run dev -w web\"",
+    "build": "npm run build -w web",
+    "test": "npm run test -w server",
+    "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w web",
+    "setup": "npm run generate -w server && npm run db:push -w server && npm run seed -w server",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EstadoComprobante {
+  PROCESANDO
+  PROCESADO
+  FALLIDO
+  CONFIRMADO
+}
+
+enum MetodoPago {
+  EFECTIVO
+  YAPE
+  PLIN
+  TRANSFERENCIA
+  TARJETA
+  OTRO
+}
+
+model Usuario {
+  id           String   @id @default(uuid()) @db.Uuid
+  username     String   @unique
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  eventosCreados  Evento[]
+  participaciones Participacion[]
+  comprobantes    Comprobante[]
+  pagos           Pago[]
+  itemConsumos    ItemConsumo[]
+
+  @@map("usuarios")
+}
+
+model Evento {
+  id        String   @id @default(uuid()) @db.Uuid
+  nombre    String
+  creadorId String   @map("creador_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  creador        Usuario        @relation(fields: [creadorId], references: [id])
+  participaciones Participacion[]
+  comprobantes   Comprobante[]
+  deudas         Deuda[]
+
+  @@map("eventos")
+}
+
+model Participacion {
+  id        String   @id @default(uuid()) @db.Uuid
+  eventoId  String   @map("evento_id") @db.Uuid
+  usuarioId String   @map("usuario_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  evento  Evento  @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([eventoId, usuarioId])
+  @@map("participaciones")
+}
+
+model Comprobante {
+  id              String            @id @default(uuid()) @db.Uuid
+  eventoId        String            @map("evento_id") @db.Uuid
+  pagadorId       String            @map("pagador_id") @db.Uuid
+  imagenPath      String            @map("imagen_path")
+  montoTotalCents Int               @default(0) @map("monto_total_cents")
+  estado          EstadoComprobante @default(PROCESANDO)
+  modalidad       String?
+  datosExtraidos  Json?             @map("datos_extraidos")
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  evento  Evento   @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  pagador Usuario  @relation(fields: [pagadorId], references: [id])
+  items   Item[]
+  deudas  Deuda[]
+
+  @@map("comprobantes")
+}
+
+model Item {
+  id            String @id @default(uuid()) @db.Uuid
+  comprobanteId String @map("comprobante_id") @db.Uuid
+  descripcion   String
+  montoCents    Int    @map("monto_cents")
+
+  comprobante Comprobante   @relation(fields: [comprobanteId], references: [id], onDelete: Cascade)
+  consumos    ItemConsumo[]
+
+  @@map("items")
+}
+
+model ItemConsumo {
+  id        String @id @default(uuid()) @db.Uuid
+  itemId    String @map("item_id") @db.Uuid
+  usuarioId String @map("usuario_id") @db.Uuid
+
+  item    Item    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, usuarioId])
+  @@map("item_consumos")
+}
+
+model Deuda {
+  id              String   @id @default(uuid()) @db.Uuid
+  eventoId        String   @map("evento_id") @db.Uuid
+  comprobanteId   String   @map("comprobante_id") @db.Uuid
+  acreedorId      String   @map("acreedor_id") @db.Uuid
+  deudorId        String   @map("deudor_id") @db.Uuid
+  montoTotalCents Int      @map("monto_total_cents")
+  saldoCents      Int      @map("saldo_cents")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  evento      Evento      @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  comprobante Comprobante @relation(fields: [comprobanteId], references: [id], onDelete: Cascade)
+  acreedor    Usuario     @relation("DeudaAcreedor", fields: [acreedorId], references: [id])
+  deudor      Usuario     @relation("DeudaDeudor", fields: [deudorId], references: [id])
+  pagos       Pago[]
+
+  @@map("deudas")
+}
+
+model Pago {
+  id         String     @id @default(uuid()) @db.Uuid
+  deudaId    String     @map("deuda_id") @db.Uuid
+  usuarioId  String     @map("usuario_id") @db.Uuid
+  montoCents Int        @map("monto_cents")
+  metodo     MetodoPago
+  referencia String?
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  deuda   Deuda   @relation(fields: [deudaId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@map("pagos")
+}
