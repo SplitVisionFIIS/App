@@ -1,0 +1,50 @@
+{
+  "name": "splitvision",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SplitVision — división de gastos con OCR (backend)",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "dev": "npm run build && node dist/main.js",
+    "dev:worker": "npm run build && node dist/worker.js",
+    "start": "node dist/main.js",
+    "start:worker": "node dist/worker.js",
+    "migrate": "npm run build && node dist/db/migrate.js",
+    "test": "jest --runInBand",
+    "dev:fe": "npm --prefix frontend run dev",
+    "build:fe": "npm --prefix frontend run build",
+    "test:fe": "npm --prefix frontend run test"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/typeorm": "^11.0.0",
+    "@node-rs/argon2": "^2.0.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "opossum": "^8.0.1",
+    "pg": "^8.13.0",
+    "reflect-metadata": "^0.2.2",
+    "tesseract.js": "^7.0.0",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.10.0",
+    "@types/opossum": "^8.1.9",
+    "@types/pg": "^8.23.1",
+    "fast-check": "^3.23.0",
+    "jest": "^30.5.2",
+    "testcontainers": "^12.2.1",
+    "ts-jest": "^29.4.14",
+    "typescript": "^5.7.0"
+  },
+  "overrides": {
+    "js-yaml": "^4.1.0"
+  }
+}
