@@ -2,7 +2,7 @@
 
 **Curso:** Construcción de Software II (SW707) · **Versión:** v1.0
 
-## Stack tecnológico actualizado
+## Stack tecnológico
 
 | Capa | Tecnología |
 |---|---|

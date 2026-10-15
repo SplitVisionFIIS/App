@@ -13,8 +13,7 @@
 
 Divide gastos entre amigos a partir de fotos de comprobantes. Este repositorio contiene
 el **backend** (API + worker de OCR + PostgreSQL) y el **frontend** (`frontend/`, React +
-Vite), construidos según los requisitos de `docs/RF.md`, el contrato de usuario de
-`docs/CU.md` y las decisiones de `docs/ADR.md`.
+Vite)
 
 ## Stack
 
