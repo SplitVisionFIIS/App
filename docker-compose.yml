@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: splitvision
+      POSTGRES_PASSWORD: splitvision
+      POSTGRES_DB: splitvision
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U splitvision -d splitvision"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    command: ["node", "dist/main.js"]
+    environment: &common-env
+      DATABASE_URL: postgres://splitvision:splitvision@postgres:5432/splitvision
+      PORT: "3000"
+      IMAGE_DIR: /data/images
+      SESSION_SECRET: ${SESSION_SECRET:-dev-secret-change-me}
+      OCR_PROVIDER: ${OCR_PROVIDER:-local}
+      OCR_URL: ${OCR_URL:-}
+      OCR_TIMEOUT_MS: "10000"
+      OCR_MAX_ATTEMPTS: "4"
+      OCR_BACKOFF_MS: "2000,4000,8000"
+      OCR_BREAKER_THRESHOLD: "50"
+      OCR_BREAKER_RESET_MS: "30000"
+      OCR_FALLBACK: ${OCR_FALLBACK:-local}
+      OCR_LANG: ${OCR_LANG:-spa}
+      OCR_TESSDATA: /app/data/tessdata
+      OCR_CACHE_DIR: /tmp/tessdata-cache
+      SESSION_HOURS: "8"
+      LOGIN_MAX_ATTEMPTS: "5"
+      LOGIN_WINDOW_MIN: "10"
+      JOB_POLL_MS: "400"
+      JOB_LEASE_S: "60"
+      MAX_UPLOAD_MB: "5"
+    ports:
+      - "3000:3000"
+    volumes:
+      - images:/data/images
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: ["node", "dist/worker.js"]
+    environment:
+      <<: *common-env
+    volumes:
+      - images:/data/images
+      - ./data/tessdata:/app/data/tessdata:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  images:

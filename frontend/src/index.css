@@ -1,0 +1,245 @@
+@import 'tailwindcss';
+
+/* Modo oscuro por clase (el <html> recibe .dark desde PreferenciasContext). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter.woff2') format('woff2');
+}
+
+/* --------------------------------------------------------------------------
+   Sistema de diseño "Ledger".
+   Base tipo papel contable verde-frío, tinta pino (primario) y acento cítrico.
+   Neutros TINTADOS (nunca crema ni gris/negro puro), todo en OKLCH para
+   armonía perceptiva y control de contraste (objetivo WCAG AA 4.5:1).
+
+   Los tokens viven como variables CSS (--sv-*) para poder alternarlos en
+   runtime: `.dark` los sobrescribe, y a futuro `html[data-temporada="x"]`
+   podrá sobreescribirlos para tematizar (p. ej. fechas/navidad) sin tocar
+   las utilidades. NO escribir colores sueltos en los componentes: usa tokens.
+   -------------------------------------------------------------------------- */
+:root {
+  /* Neutros */
+  --sv-fondo: oklch(0.985 0.006 160);
+  --sv-fondo-2: oklch(0.962 0.009 160);
+  --sv-superficie: oklch(1 0 0);
+  --sv-superficie-2: oklch(0.965 0.009 160);
+  --sv-superficie-3: oklch(0.93 0.013 160);
+  --sv-texto: oklch(0.26 0.02 160);
+  --sv-texto-suave: oklch(0.48 0.02 160);
+  --sv-texto-tenue: oklch(0.62 0.016 160);
+  --sv-borde: oklch(0.89 0.012 160);
+  --sv-borde-suave: oklch(0.94 0.009 160);
+  --sv-barra: oklch(0.22 0.03 165);
+  --sv-sobre-barra: oklch(0.96 0.01 160);
+
+  /* Marca: escala pino */
+  --sv-primario-50: oklch(0.975 0.018 160);
+  --sv-primario-100: oklch(0.945 0.04 161);
+  --sv-primario-200: oklch(0.89 0.07 161);
+  --sv-primario-300: oklch(0.8 0.1 162);
+  --sv-primario-400: oklch(0.7 0.12 162);
+  --sv-primario-500: oklch(0.6 0.13 163);
+  --sv-primario-600: oklch(0.53 0.12 163);
+  --sv-primario-700: oklch(0.46 0.105 164);
+  --sv-primario-800: oklch(0.39 0.085 164);
+  --sv-primario-900: oklch(0.32 0.06 165);
+
+  /* Marca: semánticos */
+  --sv-primario: oklch(0.53 0.12 163);
+  --sv-primario-fuerte: oklch(0.46 0.105 164);
+  --sv-primario-suave: oklch(0.945 0.04 161);
+  --sv-sobre-primario: oklch(0.99 0.005 160);
+
+  /* Acento cítrico */
+  --sv-acento: oklch(0.72 0.16 62);
+  --sv-acento-fuerte: oklch(0.65 0.155 58);
+  --sv-acento-suave: oklch(0.95 0.05 78);
+  --sv-sobre-acento: oklch(0.24 0.03 60);
+
+  /* Estados */
+  --sv-exito: oklch(0.52 0.13 150);
+  --sv-exito-suave: oklch(0.94 0.045 150);
+  --sv-info: oklch(0.52 0.11 245);
+  --sv-info-suave: oklch(0.94 0.035 245);
+  --sv-aviso: oklch(0.56 0.12 75);
+  --sv-aviso-suave: oklch(0.95 0.055 85);
+  --sv-peligro: oklch(0.53 0.19 27);
+  --sv-peligro-suave: oklch(0.95 0.035 27);
+}
+
+.dark {
+  --sv-fondo: oklch(0.19 0.015 165);
+  --sv-fondo-2: oklch(0.22 0.018 165);
+  --sv-superficie: oklch(0.24 0.018 165);
+  --sv-superficie-2: oklch(0.28 0.02 165);
+  --sv-superficie-3: oklch(0.32 0.022 165);
+  --sv-texto: oklch(0.93 0.01 160);
+  --sv-texto-suave: oklch(0.74 0.015 160);
+  --sv-texto-tenue: oklch(0.6 0.015 160);
+  --sv-borde: oklch(0.36 0.02 165);
+  --sv-borde-suave: oklch(0.3 0.018 165);
+  --sv-barra: oklch(0.16 0.015 165);
+  --sv-sobre-barra: oklch(0.95 0.01 160);
+
+  --sv-primario: oklch(0.66 0.12 162);
+  --sv-primario-fuerte: oklch(0.72 0.11 162);
+  --sv-primario-suave: oklch(0.32 0.05 163);
+  --sv-sobre-primario: oklch(0.18 0.02 163);
+
+  --sv-acento: oklch(0.76 0.15 66);
+  --sv-acento-fuerte: oklch(0.82 0.14 70);
+  --sv-acento-suave: oklch(0.32 0.06 62);
+  --sv-sobre-acento: oklch(0.22 0.03 60);
+
+  --sv-exito: oklch(0.75 0.14 152);
+  --sv-exito-suave: oklch(0.3 0.06 152);
+  --sv-info: oklch(0.74 0.11 245);
+  --sv-info-suave: oklch(0.3 0.05 245);
+  --sv-aviso: oklch(0.8 0.13 82);
+  --sv-aviso-suave: oklch(0.32 0.06 80);
+  --sv-peligro: oklch(0.74 0.17 27);
+  --sv-peligro-suave: oklch(0.32 0.08 27);
+}
+
+/* Exposición a Tailwind: `inline` hace que las utilidades apunten a var(--sv-*)
+   (resuelto en runtime), de modo que `.dark` y futuras temporadas funcionan. */
+@theme inline {
+  --color-fondo: var(--sv-fondo);
+  --color-fondo-2: var(--sv-fondo-2);
+  --color-superficie: var(--sv-superficie);
+  --color-superficie-2: var(--sv-superficie-2);
+  --color-superficie-3: var(--sv-superficie-3);
+  --color-texto: var(--sv-texto);
+  --color-texto-suave: var(--sv-texto-suave);
+  --color-texto-tenue: var(--sv-texto-tenue);
+  --color-borde: var(--sv-borde);
+  --color-borde-suave: var(--sv-borde-suave);
+  --color-barra: var(--sv-barra);
+  --color-sobre-barra: var(--sv-sobre-barra);
+
+  --color-primario: var(--sv-primario);
+  --color-primario-fuerte: var(--sv-primario-fuerte);
+  --color-primario-suave: var(--sv-primario-suave);
+  --color-sobre-primario: var(--sv-sobre-primario);
+  --color-primario-50: var(--sv-primario-50);
+  --color-primario-100: var(--sv-primario-100);
+  --color-primario-200: var(--sv-primario-200);
+  --color-primario-300: var(--sv-primario-300);
+  --color-primario-400: var(--sv-primario-400);
+  --color-primario-500: var(--sv-primario-500);
+  --color-primario-600: var(--sv-primario-600);
+  --color-primario-700: var(--sv-primario-700);
+  --color-primario-800: var(--sv-primario-800);
+  --color-primario-900: var(--sv-primario-900);
+
+  --color-acento: var(--sv-acento);
+  --color-acento-fuerte: var(--sv-acento-fuerte);
+  --color-acento-suave: var(--sv-acento-suave);
+  --color-sobre-acento: var(--sv-sobre-acento);
+
+  --color-exito: var(--sv-exito);
+  --color-exito-suave: var(--sv-exito-suave);
+  --color-info: var(--sv-info);
+  --color-info-suave: var(--sv-info-suave);
+  --color-aviso: var(--sv-aviso);
+  --color-aviso-suave: var(--sv-aviso-suave);
+  --color-peligro: var(--sv-peligro);
+  --color-peligro-suave: var(--sv-peligro-suave);
+}
+
+/* Wordmark de marca (símbolo en Logo.tsx) */
+.logotipo {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--sv-texto);
+  white-space: nowrap;
+}
+
+.logotipo .acento {
+  color: var(--sv-acento);
+}
+
+body {
+  margin: 0;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color: var(--sv-texto);
+  /* Degradado "ledger": papel verde-frío con un halo pino y un toque cítrico.
+     Fijo para que no "salte" al hacer scroll; las tarjetas resaltan. */
+  background-color: var(--sv-fondo);
+  background-image:
+    radial-gradient(1100px 560px at 100% -8%, oklch(0.53 0.12 163 / 0.1), transparent 60%),
+    radial-gradient(900px 520px at -8% 108%, oklch(0.72 0.16 62 / 0.06), transparent 58%),
+    linear-gradient(180deg, var(--sv-fondo) 0%, var(--sv-fondo-2) 100%);
+  background-attachment: fixed;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(1100px 560px at 100% -8%, oklch(0.53 0.12 163 / 0.16), transparent 60%),
+    radial-gradient(900px 520px at -8% 108%, oklch(0.72 0.16 62 / 0.09), transparent 58%),
+    linear-gradient(180deg, var(--sv-fondo) 0%, var(--sv-fondo-2) 100%);
+}
+
+/* Fondo cinematográfico de autenticación (login/registro).
+   Primera capa: foto en public/login-fondo.jpg (16:9).
+   Si el archivo no existe, queda el degradado de respaldo. */
+.fondo-login {
+  position: relative;
+  isolation: isolate;
+  background-image:
+    url('/login-fondo.jpg'),
+    linear-gradient(120deg, #f7fbf8 0%, #dff0e6 28%, #f6eccb 52%, #f0dcc2 72%, #d6e9de 100%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Velo luminoso: el tercio izquierdo queda limpio y sereno para la tarjeta */
+.fondo-veo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(247, 251, 248, 0.97) 0%,
+    rgba(247, 251, 248, 0.92) 26%,
+    rgba(247, 251, 248, 0.45) 46%,
+    rgba(247, 251, 248, 0.05) 66%,
+    rgba(247, 251, 248, 0) 80%
+  );
+}
+
+/* Desenfoque suave solo sobre el tercio izquierdo (depth of field) */
+.fondo-desenfoque {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  mask-image: linear-gradient(to right, #000 0%, #000 26%, transparent 50%);
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 26%, transparent 50%);
+}
+
+@media (max-width: 1023px) {
+  .fondo-veo {
+    background: rgba(247, 251, 248, 0.9);
+  }
+  .fondo-desenfoque {
+    display: none;
+  }
+}
