@@ -46,7 +46,7 @@ export function Campo({
           id={identificador}
           type={tipoReal}
           aria-invalid={error ? true : undefined}
-          className={`w-full rounded-xl border bg-superficie py-2.5 text-sm text-texto shadow-xs transition-all placeholder:text-texto-tenue/60 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+          className={`w-full min-h-[44px] rounded-xl border bg-superficie py-2.5 text-base sm:text-sm text-texto placeholder:text-texto-tenue/60 transition-[border-color,box-shadow,background-color] duration-150 ease-out focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60 ${
             icono ? 'pl-10' : 'pl-3.5'
           } ${esPassword || accionDerecha ? 'pr-11' : 'pr-3.5'} ${
             error
@@ -62,7 +62,7 @@ export function Campo({
             onClick={() => setMostrarPassword((prev) => !prev)}
             aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
             tabIndex={-1}
-            className="absolute right-2.5 flex h-8 w-8 items-center justify-center rounded-lg text-texto-suave transition-colors hover:bg-superficie-2 hover:text-texto focus:outline-none"
+            className="absolute right-2.5 flex h-8 w-8 items-center justify-center rounded-lg text-texto-suave transition-[transform,color,background-color] duration-125 ease-out hover:bg-superficie-2 hover:text-texto active:scale-90 focus:outline-none"
           >
             {mostrarPassword ? (
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -81,7 +81,7 @@ export function Campo({
       </div>
 
       {error ? (
-        <p role="alert" className="flex items-center gap-1.5 pt-0.5 text-xs font-medium text-peligro">
+        <p role="alert" className="alerta-entrada flex items-center gap-1.5 pt-0.5 text-xs font-medium text-peligro">
           <svg className="h-3.5 w-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>

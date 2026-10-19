@@ -22,6 +22,12 @@ export class User {
   @Column({ type: 'varchar', length: 255 }) email: string;
   @Column({ name: 'password_hash', type: 'text' }) passwordHash: string;
   @Column({ name: 'image_path', type: 'text', nullable: true }) imagePath: string | null;
+  @Column({ type: 'varchar', length: 20, nullable: true }) phone: string | null;
+  @Column({ name: 'bank_name', type: 'varchar', length: 50, nullable: true }) bankName: string | null;
+  @Column({ name: 'account_number', type: 'varchar', length: 50, nullable: true }) accountNumber: string | null;
+  @Column({ name: 'qr_image_path', type: 'text', nullable: true }) qrImagePath: string | null;
+  @Column({ name: 'preferred_wallet', type: 'varchar', length: 20, nullable: true }) preferredWallet: string | null;
+  @Column({ type: 'varchar', length: 30, nullable: true }) cci: string | null;
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' }) createdAt: Date;
 }
 

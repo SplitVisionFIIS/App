@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Header,
+  Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -79,7 +82,29 @@ export class AuthController {
       username: profile.username,
       hasImage: profile.hasImage,
       imageUrl: profile.hasImage ? '/api/auth/me/image' : undefined,
+      phone: profile.phone,
+      preferredWallet: profile.preferredWallet,
+      bankName: profile.bankName,
+      accountNumber: profile.accountNumber,
+      cci: profile.cci,
+      hasQr: profile.hasQr,
+      qrUrl: profile.hasQr ? '/api/auth/me/qr' : undefined,
     };
+  }
+
+  @Patch('profile')
+  updateProfile(
+    @User() user: AuthUser,
+    @Body()
+    body: {
+      phone?: string | null;
+      preferredWallet?: string | null;
+      bankName?: string | null;
+      accountNumber?: string | null;
+      cci?: string | null;
+    },
+  ) {
+    return this.auth.updatePaymentProfile(user.id, body ?? {});
   }
 
   @Post('me/image')
@@ -97,6 +122,39 @@ export class AuthController {
   @Header('cache-control', 'private, no-store')
   async avatar(@User() user: AuthUser, @Res() res: Response) {
     const buf = await this.auth.readImage(user.id);
+    const ext = buf[0] === 0x89 ? 'image/png' : buf[0] === 0xff ? 'image/jpeg' : 'image/webp';
+    res.setHeader('content-type', ext);
+    res.send(buf);
+  }
+
+  @Post('me/qr')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      limits: { files: 1, fileSize: Number(process.env.MAX_UPLOAD_MB ?? 5) * 1024 * 1024 * 10 },
+    }),
+  )
+  uploadQr(@User() user: AuthUser, @UploadedFile() file?: Express.Multer.File) {
+    return this.auth.setQrImage(user.id, file?.buffer ?? Buffer.alloc(0));
+  }
+
+  @Get('me/qr')
+  @Header('cache-control', 'private, no-store')
+  async myQr(@User() user: AuthUser, @Res() res: Response) {
+    const buf = await this.auth.readQrImage(user.id);
+    const ext = buf[0] === 0x89 ? 'image/png' : buf[0] === 0xff ? 'image/jpeg' : 'image/webp';
+    res.setHeader('content-type', ext);
+    res.send(buf);
+  }
+
+  @Delete('me/qr')
+  deleteQr(@User() user: AuthUser) {
+    return this.auth.deleteQrImage(user.id);
+  }
+
+  @Get('users/:id/qr')
+  @Header('cache-control', 'private, max-age=60')
+  async userQr(@Param('id') userId: string, @Res() res: Response) {
+    const buf = await this.auth.readQrImage(userId);
     const ext = buf[0] === 0x89 ? 'image/png' : buf[0] === 0xff ? 'image/jpeg' : 'image/webp';
     res.setHeader('content-type', ext);
     res.send(buf);

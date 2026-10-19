@@ -140,10 +140,88 @@ export class AuthService {
     return { sessionId: session.id, csrf, username: user.username };
   }
 
-  async getProfile(user: { id: string; username: string }): Promise<{ username: string; hasImage: boolean }> {
-    const rows = await this.dataSource.query(`SELECT image_path FROM users WHERE id = $1`, [user.id]);
-    const hasImage = rows.length > 0 && Boolean(rows[0].image_path);
-    return { username: user.username, hasImage };
+  async getProfile(user: { id: string; username: string }): Promise<{
+    username: string;
+    hasImage: boolean;
+    phone: string | null;
+    preferredWallet: string | null;
+    bankName: string | null;
+    accountNumber: string | null;
+    cci: string | null;
+    hasQr: boolean;
+  }> {
+    const rows = await this.dataSource.query(
+      `SELECT image_path, phone, preferred_wallet, bank_name, account_number, cci, qr_image_path FROM users WHERE id = $1`,
+      [user.id],
+    );
+    if (rows.length === 0) {
+      return {
+        username: user.username,
+        hasImage: false,
+        phone: null,
+        preferredWallet: 'YAPE',
+        bankName: null,
+        accountNumber: null,
+        cci: null,
+        hasQr: false,
+      };
+    }
+    const r = rows[0];
+    return {
+      username: user.username,
+      hasImage: Boolean(r.image_path),
+      phone: r.phone ?? null,
+      preferredWallet: r.preferred_wallet ?? 'YAPE',
+      bankName: r.bank_name ?? null,
+      accountNumber: r.account_number ?? null,
+      cci: r.cci ?? null,
+      hasQr: Boolean(r.qr_image_path),
+    };
+  }
+
+  async updatePaymentProfile(
+    userId: string,
+    input: {
+      phone?: string | null;
+      preferredWallet?: string | null;
+      bankName?: string | null;
+      accountNumber?: string | null;
+      cci?: string | null;
+    },
+  ): Promise<{ ok: true }> {
+    const phone = input.phone !== undefined ? (input.phone ? String(input.phone).trim() : null) : undefined;
+    const preferredWallet =
+      input.preferredWallet !== undefined
+        ? (input.preferredWallet ? String(input.preferredWallet).trim() : 'YAPE')
+        : undefined;
+    const bankName = input.bankName !== undefined ? (input.bankName ? String(input.bankName).trim() : null) : undefined;
+    const accountNumber = input.accountNumber !== undefined ? (input.accountNumber ? String(input.accountNumber).trim() : null) : undefined;
+    const cci = input.cci !== undefined ? (input.cci ? String(input.cci).trim() : null) : undefined;
+
+    if (phone && !/^[0-9+ \-]{6,20}$/.test(phone)) {
+      throw validation('teléfono: formato de número inválido');
+    }
+    if (cci && !/^[0-9\- ]{10,30}$/.test(cci)) {
+      throw validation('CCI: formato inválido');
+    }
+
+    await this.dataSource.query(
+      `UPDATE users SET
+         phone = COALESCE($1, phone),
+         preferred_wallet = COALESCE($2, preferred_wallet),
+         bank_name = COALESCE($3, bank_name),
+         account_number = COALESCE($4, account_number),
+         cci = COALESCE($5, cci)
+       WHERE id = $6`,
+      [phone, preferredWallet, bankName, accountNumber, cci, userId],
+    );
+    await audit(this.dataSource.manager, {
+      userId,
+      operation: 'user.payment_profile',
+      resource: `user:${userId}`,
+      result: 'ok',
+    });
+    return { ok: true };
   }
 
   async setImage(userId: string, buffer: Buffer): Promise<{ hasImage: true }> {
@@ -168,6 +246,45 @@ export class AuthService {
     const rows = await this.dataSource.query(`SELECT image_path FROM users WHERE id = $1`, [userId]);
     if (rows.length === 0 || !rows[0].image_path) throw notFound('el usuario no tiene imagen');
     return this.storage.read(rows[0].image_path);
+  }
+
+  async setQrImage(userId: string, buffer: Buffer): Promise<{ hasQr: true }> {
+    const saved = this.storage.saveImage(buffer, `usuario-qr-${userId}`);
+    const rows = await this.dataSource.query(`SELECT qr_image_path FROM users WHERE id = $1`, [userId]);
+    if (rows.length === 0) {
+      this.storage.delete(saved.path);
+      throw notFound('usuario no encontrado');
+    }
+    await this.dataSource.query(`UPDATE users SET qr_image_path = $1 WHERE id = $2`, [saved.path, userId]);
+    await audit(this.dataSource.manager, {
+      userId,
+      operation: 'user.qr_image',
+      resource: `user:${userId}`,
+      result: 'ok',
+    });
+    if (rows[0].qr_image_path) this.storage.delete(rows[0].qr_image_path);
+    return { hasQr: true };
+  }
+
+  async readQrImage(userId: string): Promise<Buffer> {
+    const rows = await this.dataSource.query(`SELECT qr_image_path FROM users WHERE id = $1`, [userId]);
+    if (rows.length === 0 || !rows[0].qr_image_path) throw notFound('el usuario no tiene código QR');
+    return this.storage.read(rows[0].qr_image_path);
+  }
+
+  async deleteQrImage(userId: string): Promise<{ ok: true }> {
+    const rows = await this.dataSource.query(`SELECT qr_image_path FROM users WHERE id = $1`, [userId]);
+    if (rows.length > 0 && rows[0].qr_image_path) {
+      this.storage.delete(rows[0].qr_image_path);
+      await this.dataSource.query(`UPDATE users SET qr_image_path = NULL WHERE id = $1`, [userId]);
+      await audit(this.dataSource.manager, {
+        userId,
+        operation: 'user.delete_qr',
+        resource: `user:${userId}`,
+        result: 'ok',
+      });
+    }
+    return { ok: true };
   }
 
   async changePassword(

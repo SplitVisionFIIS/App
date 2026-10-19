@@ -58,13 +58,22 @@ function normalizar(text: string): string {
   return text.replace(/(\d)\s*[-–—]\s*(\d{2})(?!\d)/g, '$1.$2');
 }
 
-const ES_TOTAL = /(\bTOTAL\b|A\s*PAGAR|IMPORTE\s*(TOTAL|A\s*PAGAR|FINAL)?|MONTO\s*TOTAL)/i;
+const ES_TOTAL = /(\bTOTAL\b|A\s*PAGAR|IMPORTE\s*(TOTAL|A\s*PAGAR|FINAL)?|MONTO\s*TOTAL|VENTA\s*TOTAL|TOTAL\s*VENTA|IMPORTE\s*TOTAL|CONSUMO)/i;
 const ES_SUBTOTAL = /\bSUB\s*-?\s*TOTAL\b/i;
 const ES_TAX = /(\bI\.?G\.?V\.?\b|\bI\.?V\.?A\.?\b|IMPUESTO)/i;
 const ES_TIP = /(\bSERVICIO\b|\bPROPINA\b|\bTIP\b)/i;
 const ES_DESCUENTO = /\bDESCUENTO\b/i;
-const ES_RUIDO =
-  /^(RUC|R\.?U\.?C|DNI|TEL|TELF|FECHA|HORA|C\.?AJA|CAJERO|SERIE|BOLETA|FACTURA|DOCUMENTO|CIUDAD|DIRECCION|DIRECCIÓN|GRACIAS|ATENDI|MESA|MOZO|CANT)/i;
+const CONTIENE_METADATO =
+  /(?:\b(RUC|DNI|TEL[EÉ]FONO|TELFS?|HORA|EMISI[OÓ]N|FEC\b|CAJA|CAJERO|SERIE|BOLETA|FACTURA|DOCUMENTO|CIUDAD|DIRECCI[OÓ]N|DOMICILIO|CALLE|AVENIDA|AVDA|JIR[OÓ]N|PASAJE|MESA|MOZO|MESERO|ATENDI[DO]?|CLIENTE|NOMBRE|PEDIDO|ORDEN|TICKET|SUB-?TOTAL|OP\.?\s*GRAV|OP\.?\s*INAF|OP\.?\s*EXON|IGV|IVA|ICBPER?|PAGO|PAGADO|VISA|MASTERCARD|EFECTIVO|VUELTO|GRACIAS|SON\s*:)\b|\bDOM\.?\s*[HF]ISCAL|\bLOCAL\s*:|\bAV[D.]?,?\s+[A-Z]|\bJR[.]?,?\s+[A-Z]|\bMZ[.]?\s*[A-Z0-9]|\bLOTE\s*\d|\bREF(?:ERENCIA)?[.]?\s*:|\bSR[.]?\(?A\)?|\bMESA\s*:?\s*\d|\bFORMA\s+DE\s+PAGO|\bPAGO\s+CON)/i;
+
+const ES_RUIDO = CONTIENE_METADATO;
+
+const ES_FECHA_O_HORA = /(?:\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\d{1,2}:\d{2}(?::\d{2})?\b)/;
+
+function esCabeceraTabla(linea: string): boolean {
+  const palabras = linea.match(/\b(PRODUCTO|DESCRIPCI[OÓ]N|CANT|CANTIDAD|P\.?\s*UNIT|PRECIO|IMPORTE|TOTAL)\b/gi) || [];
+  return palabras.length >= 2;
+}
 
 function limpiarDescripcion(raw: string): string {
   return raw
@@ -75,9 +84,16 @@ function limpiarDescripcion(raw: string): string {
     .slice(0, 200);
 }
 
-/** Quita del texto la columna de precios (moneda + importes) que va al final. */
+/** Quita del texto únicamente la columna de precios y símbolos al final. */
 function textoDescripcion(descRaw: string): string {
-  return descRaw.replace(/\s*[|].*$/u, '').replace(/\s*[sS$]?\s*\/?\.?\s*\d.*$/u, ' ');
+  let s = descRaw;
+  if (s.includes('|')) {
+    s = s.replace(/\s*[|].*$/u, '');
+  }
+  // Quita importes y monedas al final de la línea sin comerse la 's' final de palabras (como "Papas")
+  return s
+    .replace(/(?:(?:S\s*\/\.?|S\/|\$|PEN|USD)\s*)?(?:\d[\d.,]*\d|\d)(?:\s+(?:(?:S\s*\/\.?|S\/|\$|PEN|USD)\s*)?(?:\d[\d.,]*\d|\d))*\s*$/u, ' ')
+    .trim();
 }
 
 function sumaCents(items: RawOcrItem[]): number {
@@ -113,10 +129,18 @@ export function reconciliar(items: RawOcrItem[], objetivoCents: number): RawOcrI
   return null;
 }
 
+function tienePrecio(linea: string): boolean {
+  return /(?:[sS$€£]\s*\/?\.?\s*\d|\d+[.,]\d{2}(?!\d))/.test(linea);
+}
+
+function esInicioDeNuevoItem(linea: string): boolean {
+  return /^(?:[(\[])?\d{1,3}[)\]]?\s*(?:[xX*|]\s*|\s+)[a-zA-Z\p{L}]/u.test(linea.trim());
+}
+
 /**
- * Extrae ítems de las líneas de detalle. Si su suma no cuadra con el total, se
- * intenta reconciliar; si no se logra, se conservan igualmente como mejor
- * esfuerzo (`reconciled: false`) para que el usuario los revise.
+ * Extrae ítems de las líneas de detalle con soporte para descripciones
+ * partidas en múltiples líneas (tanto cuando el precio está en la 1ra como en la 2da fila)
+ * y filtrado riguroso de metadatos administrativos.
  */
 function extraerItems(
   lineas: string[],
@@ -124,13 +148,57 @@ function extraerItems(
   extras: number,
 ): { items: RawOcrItem[]; reconciled: boolean } {
   const items: RawOcrItem[] = [];
-  for (const linea of lineas) {
+  let pendingPrefix = '';
+
+  for (let i = 0; i < lineas.length; i++) {
+    const linea = lineas[i];
     const tieneMonto = numeros(linea).length > 0;
     if (tieneMonto && (ES_TOTAL.test(linea) || ES_SUBTOTAL.test(linea))) break;
     if (ES_TAX.test(linea) || ES_TIP.test(linea) || ES_DESCUENTO.test(linea)) continue;
-    const item = parsearLineaItem(linea);
-    if (item) items.push(item);
+    if (CONTIENE_METADATO.test(linea) || ES_FECHA_O_HORA.test(linea) || esCabeceraTabla(linea)) {
+      pendingPrefix = '';
+      continue;
+    }
+
+    // Si la línea actual es por sí sola un ítem válido, cualquier pendingPrefix
+    // anterior era un encabezado/nombre de local y se descarta.
+    const itemSolo = parsearLineaItem(linea);
+    if (itemSolo) {
+      items.push(itemSolo);
+      pendingPrefix = '';
+      continue;
+    }
+
+    const lineaConPrefix = pendingPrefix ? `${pendingPrefix} ${linea}` : linea;
+    const item = parsearLineaItem(lineaConPrefix);
+
+    if (item) {
+      items.push(item);
+      pendingPrefix = '';
+    } else {
+      const lineaTienePrecio = tienePrecio(linea);
+      const iniciaNuevo = esInicioDeNuevoItem(linea);
+
+      // Reconstrucción de ítems multilínea:
+      // Caso 1: La fila siguiente es continuación de la descripción del ítem anterior
+      // (el precio apareció en la primera fila, ej. "1 Pollo a la brasa 65.00" seguido de "fritas y ensalada")
+      if (!lineaTienePrecio && !iniciaNuevo && items.length > 0) {
+        const descCont = limpiarDescripcion(linea);
+        if (descCont.length >= 2) {
+          items[items.length - 1].description = limpiarDescripcion(
+            `${items[items.length - 1].description} ${descCont}`,
+          );
+          continue;
+        }
+      }
+
+      // Caso 2: Es el título que continúa en la siguiente línea con el precio
+      if (!lineaTienePrecio) {
+        pendingPrefix = pendingPrefix ? `${pendingPrefix} ${linea}` : linea;
+      }
+    }
   }
+
   if (items.length === 0) return { items: [], reconciled: true };
   const objetivoCents = Math.round((total - extras) * 100);
   if (sumaCents(items) === objetivoCents) return { items, reconciled: true };
@@ -141,29 +209,41 @@ function extraerItems(
 
 function parsearLineaItem(linea: string): RawOcrItem | null {
   const l = linea.trim();
-  if (!l || ES_RUIDO.test(l)) return null;
+  if (!l || CONTIENE_METADATO.test(l) || ES_FECHA_O_HORA.test(l) || esCabeceraTabla(l)) return null;
 
-  // Formato con cantidad y separador de columnas: "<=. (2) | Desc ... 18.00 36.00"
-  const conQty = l.match(/(\d{1,3})\s*[)\]]?\s*[|]\s*(.+)$/);
-  if (conQty) {
-    const ns = numeros(conQty[2]);
-    const item = armarItem(Number(conQty[1]), conQty[2], ns);
+  // 1) Formato con pipe (columnas): "<=. (2) | Desc ... 18.00 36.00"
+  const conPipe = l.match(/^(?:.*?[(\[])?(\d{1,3})[)\]]?\s*[|]\s*(.+)$/);
+  if (conPipe) {
+    const qty = Number(conPipe[1]);
+    const cuerpo = conPipe[2].trim();
+    const item = armarItem(qty, cuerpo);
     if (item) return item;
   }
 
-  const ns = numeros(l);
-  if (ns.length >= 2) {
-    const item =
-      armarItem(Number(l.match(/^\s*(\d{1,3})\b/)?.[1] ?? NaN), l, ns) ??
-      armarItem(Number(l.match(/\b(\d{1,3})\s*[xX]\b/)?.[1] ?? NaN), l, ns);
+  // 2) Formato estándar sin pipe: "2 Ceviche Mixto 45.00" o "2x Cerveza 12.00" o "(1) Cafe 8.00"
+  const conQtyInicio = l.match(/^(?:[(\[])?(\d{1,3})[)\]]?\s*(?:[xX*]\s*|\s+)(.+)$/);
+  if (conQtyInicio) {
+    const qty = Number(conQtyInicio[1]);
+    const cuerpo = conQtyInicio[2].trim();
+    const item = armarItem(qty, cuerpo);
     if (item) return item;
   }
+
+  // 3) Sin cantidad explícita (asume cantidad = 1):
+  // Debe contener un formato claro de precio decimal (ej. 45.00) o símbolo de moneda para evitar números de calle
+  const tienePrecioDecimalOMoneda = /(?:[sS$€£]\s*\/?\.?\s*\d|\d+[.,]\d{2}(?!\d))/.test(l);
+  if (tienePrecioDecimalOMoneda) {
+    const itemSinQty = armarItem(1, l);
+    if (itemSinQty) return itemSinQty;
+  }
+
   return null;
 }
 
-/** Arma un ítem tomando los dos últimos importes como (unitario, total). */
-function armarItem(qty: number, descRaw: string, ns: number[]): RawOcrItem | null {
+/** Arma un ítem calculando precio unitario y extrayendo descripción limpia. */
+function armarItem(qty: number, descRaw: string): RawOcrItem | null {
   if (!Number.isInteger(qty) || qty < 1 || qty > 999) return null;
+  const ns = numeros(descRaw);
   if (ns.length < 1) return null;
   let unit = ns[ns.length - 1];
   if (ns.length >= 2) {
@@ -171,9 +251,10 @@ function armarItem(qty: number, descRaw: string, ns: number[]): RawOcrItem | nul
     const b = ns[ns.length - 1];
     if (Math.abs(a * qty - b) <= 0.011) unit = a;
     else if (Math.abs(b * qty - a) <= 0.011) unit = b;
-    else unit = a;
+    else if (qty === 1) unit = a;
+    else unit = b / qty;
   }
-  if (!(unit > 0)) return null;
+  if (!(unit > 0) || unit > 10_000) return null;
   const desc = limpiarDescripcion(textoDescripcion(descRaw));
   if (desc.replace(/[^\p{L}]/gu, '').length < 2) return null;
   return { description: desc, quantity: qty, unit_price: unit };

@@ -16,9 +16,11 @@ export class ConsultasController {
     @User() user: AuthUser,
     @Query('direction') direction?: string,
     @Query('eventId') eventId?: string,
+    @Query('all') all?: string,
   ) {
     const dir = direction === 'owed' ? 'owed' : 'owing';
-    return this.consultas.myDebts(user.id, dir, eventId);
+    const includeSettled = all === 'true' || all === '1';
+    return this.consultas.myDebts(user.id, dir, eventId, includeSettled);
   }
 
   @Get('debts/:id')

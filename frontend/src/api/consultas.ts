@@ -8,11 +8,12 @@ import type {
 } from './tipos';
 
 export function deudas(
-  params: { direction?: 'owing' | 'owed'; eventId?: string } = {},
+  params: { direction?: 'owing' | 'owed'; eventId?: string; all?: boolean } = {},
 ): Promise<Deuda[]> {
   const query = new URLSearchParams();
   if (params.direction) query.set('direction', params.direction);
   if (params.eventId) query.set('eventId', params.eventId);
+  if (params.all) query.set('all', 'true');
   const qs = query.toString();
   return obtener<Deuda[]>(`/api/debts${qs ? `?${qs}` : ''}`);
 }

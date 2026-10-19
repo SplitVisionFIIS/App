@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Header,
   Param,
@@ -54,6 +55,11 @@ export class ComprobantesController {
   @Patch('receipts/:id')
   patch(@User() user: AuthUser, @Param('id') id: string, @Body() body: never) {
     return this.comprobantes.patch(id, user.id, body);
+  }
+
+  @Delete('receipts/:id')
+  delete(@User() user: AuthUser, @Param('id') id: string) {
+    return this.comprobantes.deleteReceipt(id, user.id);
   }
 
   @Post('receipts/:id/retry')

@@ -73,11 +73,11 @@ describe('MisDeudas', () => {
 
     expect(await screen.findByText('Debo')).toBeInTheDocument();
     expect(await screen.findByText(/A carla/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Pagar' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Pagar/ })).toBeInTheDocument();
 
     await usuario.click(screen.getByRole('button', { name: 'Me deben' }));
     expect(await screen.findByText(/De juan/)).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Pagar' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Pagar/ })).not.toBeInTheDocument();
   });
 
   it('muestra estado vacío cuando no hay deudas', async () => {

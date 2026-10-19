@@ -7,8 +7,8 @@ import { useSesion } from '../auth/SesionContext';
 import { Alerta } from '../componentes/Alerta';
 import { Boton } from '../componentes/Boton';
 import { Campo } from '../componentes/Campo';
-import { FondoLogin } from '../componentes/FondoLogin';
 import { Logo } from '../componentes/Logo';
+import { ReciboInteractivo } from '../componentes/ReciboInteractivo';
 import { mensajeDeError } from '../i18n/es-PE';
 
 const IconoUsuarioOEmail = () => (
@@ -20,12 +20,6 @@ const IconoUsuarioOEmail = () => (
 const IconoCandado = () => (
   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-  </svg>
-);
-
-const IconoCheck = () => (
-  <svg className="h-4 w-4 text-exito" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
   </svg>
 );
 
@@ -58,35 +52,32 @@ export function Login() {
   };
 
   return (
-    <main className="fondo-login relative flex min-h-screen w-full items-stretch overflow-hidden">
-      <FondoLogin />
-
-      <div className="relative z-10 grid w-full lg:grid-cols-12">
-        {/* Columna Izquierda: Formulario de autenticación */}
-        <section className="flex flex-col justify-between px-6 py-8 sm:px-12 sm:py-10 lg:col-span-5 lg:min-h-screen lg:px-14 lg:py-12 xl:col-span-5 tarjeta-cristal sombra-suave">
+    <main className="min-h-dvh w-full bg-fondo text-texto lg:h-screen lg:max-h-screen lg:overflow-hidden">
+      <div className="grid min-h-dvh w-full lg:h-full lg:max-h-screen lg:grid-cols-12 lg:overflow-hidden">
+        {/* Columna Izquierda: Formulario de Autenticación */}
+        <section className="flex min-h-dvh flex-col justify-between border-b border-borde/80 bg-superficie px-6 py-6 sm:px-10 lg:col-span-5 lg:min-h-0 lg:h-full lg:border-b-0 lg:border-r lg:px-12 xl:px-14 lg:overflow-hidden">
           {/* Cabecera / Marca */}
-          <div>
-            <div className="flex items-center justify-between">
-              <Logo tam={38} />
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-exito/30 bg-exito-suave/40 px-2.5 py-1 text-[11px] font-semibold text-exito">
-                <span className="h-1.5 w-1.5 rounded-full bg-exito animate-pulse" />
-                OCR Activo
-              </span>
-            </div>
+          <div className="anim-stagger-1 shrink-0 flex items-center justify-between">
+            <Link to="/" aria-label="SplitVision — inicio" className="transition-transform hover:scale-[1.02] active:scale-[0.98]">
+              <Logo tam={34} />
+            </Link>
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-texto-tenue">
+              Cuentas Claras
+            </span>
           </div>
 
-          {/* Tarjeta / Contenido Central */}
-          <div className="my-auto w-full max-w-sm py-8 sm:max-w-md">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-texto sm:text-3xl">
+          {/* Bloque central: Formulario */}
+          <div className="my-auto w-full max-w-sm py-4 sm:max-w-md mx-auto lg:mx-0">
+            <div className="anim-stagger-2">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-texto">
                 Iniciar sesión
               </h1>
-              <p className="mt-2 text-sm text-texto-suave">
-                Accede con tu correo o usuario para sincronizar tus gastos y cuentas compartidas.
+              <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-texto-suave">
+                Cuentas claras sin enredos. Sincroniza tus boletas compartidas, saldos cruzados y pagos grupales.
               </p>
             </div>
 
-            <form className="mt-7 space-y-4" onSubmit={(e) => void enviarFormulario(e)}>
+            <form className="anim-stagger-3 mt-6 space-y-3.5" onSubmit={(e) => void enviarFormulario(e)}>
               {error ? <Alerta tono="error">{error}</Alerta> : null}
 
               <Campo
@@ -95,9 +86,12 @@ export function Login() {
                 autoComplete="username"
                 required
                 icono={<IconoUsuarioOEmail />}
-                placeholder="ej. carlos@uni.edu.pe o carlos23"
+                placeholder="ej. angel o luis.vargas.p@uni.pe"
                 value={identificador}
-                onChange={(e) => setIdentificador(e.target.value)}
+                onChange={(e) => {
+                  setIdentificador(e.target.value);
+                  if (error) setError(null);
+                }}
               />
 
               <Campo
@@ -109,24 +103,27 @@ export function Login() {
                 icono={<IconoCandado />}
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) setError(null);
+                }}
               />
 
               <Boton
                 type="submit"
                 disabled={enviando}
                 cargando={enviando}
-                className="w-full py-3 text-base shadow-md"
+                className="w-full min-h-[44px] py-2.5 text-sm font-bold shadow-none"
               >
                 {enviando ? 'Ingresando…' : 'Ingresar'}
               </Boton>
             </form>
 
-            <div className="mt-6 rounded-xl border border-borde/60 bg-superficie-2/50 p-3.5 text-center text-xs text-texto-suave">
+            <div className="anim-stagger-4 mt-5 rounded-xl border border-borde/70 bg-superficie-2 p-3 text-center text-xs text-texto-suave">
               <span>¿No tienes cuenta todavía? </span>
               <Link
                 to="/registro"
-                className="font-semibold text-primario transition hover:text-primario-fuerte underline-offset-2 hover:underline"
+                className="font-bold text-primario transition-colors hover:text-primario-fuerte underline-offset-2 hover:underline"
               >
                 Regístrate gratis
               </Link>
@@ -134,85 +131,62 @@ export function Login() {
           </div>
 
           {/* Pie informativo */}
-          <footer className="pt-4 text-xs text-texto-tenue flex items-center justify-between border-t border-borde-suave">
-            <span>SplitVision • Grupo 2 FIIS</span>
-            <span>Seguridad & Privacidad</span>
+          <footer className="anim-stagger-5 shrink-0 flex items-center justify-between border-t border-borde/60 pt-3 pb-1 text-[10px] text-texto-tenue font-mono">
+            <span>SplitVision · FIIS UNI</span>
+            <span>Matriz de Deudas Neta</span>
           </footer>
         </section>
 
-        {/* Columna Derecha: Showcase visual y propuesta de valor (solo pantallas grandes) */}
-        <section aria-hidden="true" className="relative hidden flex-col justify-between p-12 lg:col-span-7 lg:flex xl:col-span-7 xl:p-16">
-          <div className="max-w-xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/25 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-md">
-              <span className="text-acento">✨</span> División de gastos con Inteligencia Artificial
-            </span>
+        {/* Columna Derecha: Showcase Interactivo Cuentas Claras */}
+        <section
+          aria-label="Simulador multi-boleta Cuentas Claras"
+          className="relative hidden h-full max-h-screen flex-col justify-between bg-barra p-6 text-sobre-barra lg:col-span-7 lg:flex xl:p-8 xl:col-span-7 overflow-hidden"
+        >
+          {/* Fondo sutil con retícula milimetrada */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+              backgroundSize: '32px 32px',
+            }}
+          />
 
-            <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-white drop-shadow-md xl:text-4xl">
-              Cuentas claras entre amigos, sin hojas de cálculo ni errores.
+          {/* Encabezado del Showcase */}
+          <div className="relative z-10 shrink-0 max-w-lg">
+            <h2 className="text-2xl xl:text-3xl font-extrabold tracking-tight text-white">
+              Cuentas claras entre amigos.
             </h2>
-            <p className="mt-3 text-base text-white/80 leading-relaxed drop-shadow">
-              Toma una foto a la boleta del restaurante o supermercado. Nuestro motor OCR extrae cada ítem al céntimo y calcula quién debe a quién al instante.
+            <p className="mt-1 text-xs xl:text-sm leading-relaxed text-sobre-barra/75">
+              En una salida o viaje grupal, varios pagan boletas distintas. SplitVision lee los comprobantes con OCR, cruza los saldos y calcula la liquidación óptima en el menor número de pagos.
             </p>
-
-            {/* Tarjeta flotante simulada de comprobante procesado */}
-            <div className="mt-8 rounded-2xl border border-white/20 bg-black/40 p-5 text-white shadow-2xl backdrop-blur-xl anim-flotar">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-acento/20 text-acento font-bold text-sm">
-                    🧾
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-white">Cena de Integración FIIS</p>
-                    <p className="text-xs text-white/60">Procesado con OCR local Tesseract</p>
-                  </div>
-                </div>
-                <span className="inline-flex items-center gap-1 rounded-md bg-exito/20 px-2 py-0.5 text-xs font-semibold text-exito-suave">
-                  <IconoCheck /> Verificado
-                </span>
-              </div>
-
-              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-lg bg-white/5 p-2.5">
-                  <p className="text-[11px] text-white/60 uppercase">Total cuenta</p>
-                  <p className="text-sm font-bold text-white">S/ 135.00</p>
-                </div>
-                <div className="rounded-lg bg-white/5 p-2.5">
-                  <p className="text-[11px] text-white/60 uppercase">Amigos</p>
-                  <p className="text-sm font-bold text-white">3 personas</p>
-                </div>
-                <div className="rounded-lg bg-white/5 p-2.5">
-                  <p className="text-[11px] text-white/60 uppercase">Cuota exacta</p>
-                  <p className="text-sm font-bold text-acento">S/ 45.00</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Puntos clave */}
-            <div className="mt-8 grid grid-cols-2 gap-4">
-              <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-3.5 backdrop-blur-sm">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primario-suave/20 text-white font-bold text-xs">
-                  ⚡
-                </span>
-                <div>
-                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">Cero fricción</h3>
-                  <p className="mt-0.5 text-xs text-white/70">Invita amigos y acepta gastos sin descargas pesadas.</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-3.5 backdrop-blur-sm">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-acento/20 text-white font-bold text-xs">
-                  🔒
-                </span>
-                <div>
-                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">Transparencia</h3>
-                  <p className="mt-0.5 text-xs text-white/70">Comprobantes y pagos auditables con historial.</p>
-                </div>
-              </div>
-            </div>
           </div>
 
-          <div className="text-xs text-white/50">
-            SplitVision • Proyecto de Arquitectura de Software 2026
+          {/* El componente vivo: Multi-Ticket y Matriz de Compensación Neta */}
+          <div className="relative z-10 my-auto py-1 flex items-center justify-center">
+            <ReciboInteractivo />
+          </div>
+
+          {/* Pie con los 2 principios técnicos del sistema */}
+          <div className="relative z-10 shrink-0 grid grid-cols-2 gap-6 border-t border-white/10 pt-3">
+            <div>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-acento">
+                Compensación Cruzada
+              </p>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-sobre-barra/70">
+                Simplifica múltiples deudas cruzadas al mínimo de pagos necesarios sin transferir de más.
+              </p>
+            </div>
+
+            <div>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+                Conservación de Céntimos
+              </p>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-sobre-barra/70">
+                Reparto exacto con contratos que aseguran que el total liquidado sea idéntico a las boletas.
+              </p>
+            </div>
           </div>
         </section>
       </div>

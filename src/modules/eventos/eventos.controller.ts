@@ -103,4 +103,9 @@ export class EventosController {
   search(@User() user: AuthUser, @Query('q') q: string) {
     return this.eventos.searchUsers(q, user.id);
   }
+
+  @Post('events/:id/compensate')
+  compensate(@User() user: AuthUser, @Param('id') id: string) {
+    return this.eventos.compensateCrossDebts(id, user.id);
+  }
 }

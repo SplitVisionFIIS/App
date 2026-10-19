@@ -9,8 +9,25 @@ export type SesionActual = {
   username: string;
   hasImage?: boolean;
   imageUrl?: string;
+  phone?: string | null;
+  preferredWallet?: string | null;
+  bankName?: string | null;
+  accountNumber?: string | null;
+  cci?: string | null;
+  hasQr?: boolean;
+  qrUrl?: string;
 };
 export type ResultadoAuth = { username: string; csrf?: string };
+
+export type CreditorPaymentInfo = {
+  phone: string | null;
+  preferredWallet: string | null;
+  bankName: string | null;
+  accountNumber: string | null;
+  cci: string | null;
+  hasQr: boolean;
+  qrUrl: string | null;
+};
 
 // ---------- Eventos ----------
 
@@ -213,6 +230,19 @@ export type Deuda = {
   reservedCents?: number;
 };
 
+export type ConsumoDetalle = {
+  description: string | null;
+  amountCents: number;
+};
+
+export type EventMutualBreakdown = {
+  totalDebtorConsumedCents: number;
+  totalCreditorConsumedCents: number;
+  netDebtCents: number;
+  debtorConsumptions: ConsumoDetalle[];
+  creditorConsumptions: ConsumoDetalle[];
+};
+
 export type HistorialDeuda = {
   debtId: string;
   eventId: string;
@@ -228,6 +258,8 @@ export type HistorialDeuda = {
   availableCents: number;
   settled: boolean;
   payments: PagoHistorial[];
+  eventBreakdown?: EventMutualBreakdown;
+  creditorPaymentInfo?: CreditorPaymentInfo;
 };
 
 // ---------- Bandeja de pendientes ----------
@@ -287,6 +319,7 @@ export type BalanceTotales = {
   settledCents: number;
   underReviewCents: number;
   outstandingCents: number;
+  grossOutstandingCents?: number;
 };
 
 export type BalanceEvento = {

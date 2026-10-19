@@ -26,3 +26,27 @@ export function cambiarContrasena(
     newPassword: contrasenaNueva,
   });
 }
+
+export function actualizarDatosCobro(datos: {
+  phone?: string | null;
+  preferredWallet?: string | null;
+  bankName?: string | null;
+  accountNumber?: string | null;
+  cci?: string | null;
+}): Promise<{ ok: boolean }> {
+  return enviar<{ ok: boolean }>('/api/auth/profile', datos, 'PATCH');
+}
+
+export function urlQrCobro(): string {
+  return '/api/auth/me/qr';
+}
+
+export function subirQrCobro(archivo: File): Promise<{ hasQr: boolean }> {
+  const form = new FormData();
+  form.append('image', archivo);
+  return subir<{ hasQr: boolean }>(urlQrCobro(), form);
+}
+
+export function eliminarQrCobro(): Promise<{ ok: boolean }> {
+  return enviar<{ ok: boolean }>(urlQrCobro(), {}, 'DELETE');
+}

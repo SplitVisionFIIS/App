@@ -51,7 +51,7 @@ export function Alerta({
   return (
     <div
       role={tono === 'error' ? 'alert' : 'status'}
-      className={`flex items-start gap-2.5 rounded-xl border px-3.5 py-2.5 text-sm ${caja} ${className}`}
+      className={`alerta-entrada flex items-start gap-2.5 rounded-xl border px-3.5 py-2.5 text-sm ${caja} ${className}`}
     >
       <span className="mt-0.5">{icono}</span>
       <div className="flex-1 leading-snug">{children}</div>

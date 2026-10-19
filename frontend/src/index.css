@@ -70,6 +70,12 @@
   --sv-aviso-suave: oklch(0.95 0.05 80);
   --sv-peligro: oklch(0.55 0.19 25);
   --sv-peligro-suave: oklch(0.95 0.035 25);
+
+  /* Curvas y tiempos de Emil Kowalski */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --duracion-rapida: 160ms;
+  --duracion-normal: 220ms;
 }
 
 .dark {
@@ -162,8 +168,23 @@
   white-space: nowrap;
 }
 
-.logotipo .acento {
-  color: var(--sv-acento);
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+[role="button"],
+.tappable {
+  touch-action: manipulation;
+}
+
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }
 
 body {
@@ -192,70 +213,95 @@ body {
     linear-gradient(180deg, var(--sv-fondo) 0%, var(--sv-fondo-2) 100%);
 }
 
-/* Fondo cinematográfico de autenticación (login/registro) */
+/* Fondo de autenticación: sólido, estructurado y sin falso vidrio */
 .fondo-login {
   position: relative;
   isolation: isolate;
-  background-image:
-    url('/login-fondo.jpg'),
-    linear-gradient(135deg, #0d2818 0%, #164024 40%, #04140c 100%);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: var(--sv-fondo);
 }
 
-.fondo-veo {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.96) 0%, rgba(245, 250, 247, 0.94) 40%, rgba(245, 250, 247, 0.75) 70%, rgba(245, 250, 247, 0.4) 100%);
+.scrim-showcase {
+  background: linear-gradient(135deg, oklch(0.14 0.03 165) 0%, oklch(0.18 0.025 240) 100%);
 }
 
-.dark .fondo-veo {
-  background: radial-gradient(circle at 10% 20%, rgba(14, 26, 20, 0.97) 0%, rgba(16, 30, 23, 0.94) 40%, rgba(12, 22, 17, 0.8) 70%, rgba(10, 18, 14, 0.5) 100%);
+.dark .scrim-showcase {
+  background: linear-gradient(135deg, oklch(0.11 0.02 165) 0%, oklch(0.14 0.02 240) 100%);
 }
 
-.fondo-desenfoque {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-@media (max-width: 1023px) {
-  .fondo-veo {
-    background: rgba(247, 251, 248, 0.94);
+/* Microinteracciones y Stagger (Emil Kowalski) */
+@keyframes svEntradaSuave {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
-  .dark .fondo-veo {
-    background: rgba(14, 24, 19, 0.95);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Utilidades modernas */
-.tarjeta-cristal {
-  background: color-mix(in oklch, var(--sv-superficie) 88%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid color-mix(in oklch, var(--sv-borde) 70%, transparent);
+.anim-stagger-1 { animation: svEntradaSuave 220ms var(--ease-out) both; animation-delay: 0ms; }
+.anim-stagger-2 { animation: svEntradaSuave 220ms var(--ease-out) both; animation-delay: 35ms; }
+.anim-stagger-3 { animation: svEntradaSuave 220ms var(--ease-out) both; animation-delay: 70ms; }
+.anim-stagger-4 { animation: svEntradaSuave 220ms var(--ease-out) both; animation-delay: 105ms; }
+.anim-stagger-5 { animation: svEntradaSuave 220ms var(--ease-out) both; animation-delay: 140ms; }
+.anim-stagger-6 { animation: svEntradaSuave 220ms var(--ease-out) both; animation-delay: 175ms; }
+
+/* Entrada fluida de alertas */
+.alerta-entrada {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
 
-.sombra-suave {
-  box-shadow: 0 10px 30px -10px oklch(0.2 0.04 165 / 0.08), 0 4px 6px -4px oklch(0.2 0.04 165 / 0.04);
+/* Escáner OCR para comprobantes */
+@keyframes lineaEscaneo {
+  0% {
+    top: 0%;
+    opacity: 0.8;
+  }
+  50% {
+    top: 96%;
+    opacity: 1;
+  }
+  100% {
+    top: 0%;
+    opacity: 0.8;
+  }
 }
 
-.dark .sombra-suave {
-  box-shadow: 0 10px 30px -10px oklch(0 0 0 / 0.35), 0 4px 6px -4px oklch(0 0 0 / 0.2);
+.anim-escaner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--sv-primario) 50%, transparent 100%);
+  box-shadow: 0 0 12px 2px color-mix(in oklch, var(--sv-primario) 60%, transparent);
+  animation: lineaEscaneo 2.4s ease-in-out infinite;
 }
 
-@keyframes flotar {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
+@media (prefers-reduced-motion: reduce) {
+  .anim-stagger-1,
+  .anim-stagger-2,
+  .anim-stagger-3,
+  .anim-stagger-4,
+  .anim-stagger-5,
+  .anim-stagger-6,
+  .alerta-entrada {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .anim-escaner {
+    animation: none !important;
+    display: none !important;
+  }
 }
 
-.anim-flotar {
-  animation: flotar 4s ease-in-out infinite;
-}
 

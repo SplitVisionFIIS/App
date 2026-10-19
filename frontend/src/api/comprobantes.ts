@@ -36,6 +36,10 @@ export function reintentarComprobante(id: string): Promise<{ id: string; status:
   return enviar<{ id: string; status: ReceiptStatus }>(`/api/receipts/${id}/retry`, {});
 }
 
+export function eliminarComprobante(id: string): Promise<{ ok: boolean }> {
+  return apiFetch<{ ok: boolean }>(`/api/receipts/${id}`, { method: 'DELETE' });
+}
+
 export function urlImagenComprobante(id: string): string {
   return `/api/receipts/${id}/image`;
 }

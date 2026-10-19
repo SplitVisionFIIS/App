@@ -84,7 +84,7 @@ export class RepartoService {
     const receipt = await this.comprobantes.loadReceipt(receiptId, userId);
     if (receipt.payerId !== userId) throw forbidden('solo el pagador puede confirmar el comprobante');
 
-    return withTx(this.dataSource, async (em) => {
+    const result = await withTx(this.dataSource, async (em) => {
       const locked = await em.query(`SELECT * FROM receipts WHERE id = $1 FOR UPDATE`, [receiptId]);
       const r = locked[0];
       if (!r) throw conflict('comprobante inexistente');
@@ -189,6 +189,9 @@ export class RepartoService {
         generated: debtSummary.length,
       };
     });
+
+    await this.eventos.compensateCrossDebts(receipt.eventId, userId);
+    return result;
   }
 
   private async clearSplit(em: import('typeorm').EntityManager, receiptId: string): Promise<void> {

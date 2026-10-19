@@ -84,6 +84,8 @@ function asNum(v: unknown): number | null {
 function toCentsExact(value: number): number | null {
   const cents = Math.round(value * 100);
   if (Math.abs(value * 100 - cents) > 1e-6) return null;
+  // Previene desbordamiento en columnas integer de PostgreSQL (máx 2,147,483,647)
+  if (cents > 200_000_000 || cents < 0) return null;
   return cents;
 }
 

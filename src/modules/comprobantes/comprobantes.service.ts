@@ -33,6 +33,26 @@ export class ComprobantesService {
           [eventId, hash],
         );
         if (existing.length > 0) {
+          if (existing[0].status === 'FALLIDO') {
+            await em.query(
+              `UPDATE receipts SET status = 'PROCESANDO', fail_reason = NULL, updated_at = now() WHERE id = $1`,
+              [existing[0].id],
+            );
+            await em.query(`DELETE FROM receipt_jobs WHERE receipt_id = $1`, [existing[0].id]);
+            await em.getRepository(ReceiptJob).insert({
+              receiptId: existing[0].id,
+              status: 'PENDING',
+              attempts: 0,
+              nextAttemptAt: new Date(),
+              leaseOwner: null,
+              leaseExpiresAt: null,
+              correlationId: correlationId(),
+              lastError: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            return { id: existing[0].id, status: 'PROCESANDO' as const, existing: false };
+          }
           return { id: existing[0].id, status: existing[0].status, existing: true };
         }
         const saved = await em.getRepository(Receipt).save(
@@ -436,5 +456,54 @@ export class ComprobantesService {
       await em.query(`DELETE FROM receipt_items WHERE receipt_id = $1`, [receiptId]);
       await this.insertItems(em, receiptId, data.items);
     });
+  }
+
+  async deleteReceipt(receiptId: string, userId: string): Promise<{ ok: boolean }> {
+    const rows = await this.dataSource.query(
+      `SELECT r.id, r.event_id, r.payer_id, r.status, r.image_path
+       FROM receipts r
+       WHERE r.id = $1`,
+      [receiptId],
+    );
+    if (rows.length === 0) throw notFound('comprobante no encontrado');
+    const receipt = rows[0];
+
+    // Verificar que el usuario pertenezca al evento
+    await this.eventos.assertParticipant(receipt.event_id, userId);
+
+    // Seguridad: solo quien subió el comprobante puede eliminarlo
+    if (receipt.payer_id !== userId) {
+      throw forbidden('solo la persona que subió el comprobante puede eliminarlo');
+    }
+
+    // Si ya tiene pagos registrados a través de sus deudas, no se puede borrar
+    const payments = await this.dataSource.query(
+      `SELECT p.id FROM payments p
+       INNER JOIN debts d ON d.id = p.debt_id
+       WHERE d.receipt_id = $1 LIMIT 1`,
+      [receiptId],
+    );
+    if (payments.length > 0) {
+      throw conflict('no se puede eliminar un comprobante que ya tiene pagos registrados');
+    }
+
+    await withTx(this.dataSource, async (em) => {
+      // Borrar deudas asociadas si existieran
+      await em.query(`DELETE FROM debts WHERE receipt_id = $1`, [receiptId]);
+      // Borrar receipt (ON DELETE CASCADE elimina items, jobs, assignments, participants)
+      await em.query(`DELETE FROM receipts WHERE id = $1`, [receiptId]);
+      await audit(em, {
+        userId,
+        operation: 'receipt.delete',
+        resource: `receipt:${receiptId}`,
+        result: 'ok',
+      });
+    });
+
+    if (receipt.image_path) {
+      this.storage.delete(receipt.image_path);
+    }
+
+    return { ok: true };
   }
 }

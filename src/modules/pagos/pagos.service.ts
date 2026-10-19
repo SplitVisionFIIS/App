@@ -264,7 +264,12 @@ export class PagosService {
   async debtHistory(debtId: string, userId: string) {
     const rows = await this.dataSource.query(
       `SELECT d.*, e.name AS event_name, r.description AS receipt_description, r.total_cents AS receipt_total,
-              cu.username AS creditor, du.username AS debtor
+              cu.username AS creditor, cu.id AS creditor_id, cu.phone AS creditor_phone,
+              cu.preferred_wallet AS creditor_preferred_wallet,
+              cu.bank_name AS creditor_bank_name, cu.account_number AS creditor_account_number,
+              cu.cci AS creditor_cci,
+              (cu.qr_image_path IS NOT NULL) AS creditor_has_qr,
+              du.username AS debtor
        FROM debts d
        JOIN events e ON e.id = d.event_id
        JOIN receipts r ON r.id = d.receipt_id
@@ -285,6 +290,39 @@ export class PagosService {
       [debtId],
     );
 
+    const mutualDebts = await this.dataSource.query(
+      `SELECT d.id, d.amount_cents, d.debtor_id, d.creditor_id, r.description AS receipt_description
+       FROM debts d
+       JOIN receipts r ON r.id = d.receipt_id
+       WHERE d.event_id = $1
+         AND ((d.debtor_id = $2 AND d.creditor_id = $3) OR (d.debtor_id = $3 AND d.creditor_id = $2))`,
+      [d.event_id, d.debtor_id, d.creditor_id],
+    );
+
+    const debtorConsumptions = mutualDebts
+      .filter((m: Record<string, unknown>) => m.debtor_id === d.debtor_id)
+      .map((m: Record<string, unknown>) => ({
+        description: m.receipt_description as string | null,
+        amountCents: Number(m.amount_cents),
+      }));
+
+    const creditorConsumptions = mutualDebts
+      .filter((m: Record<string, unknown>) => m.debtor_id === d.creditor_id)
+      .map((m: Record<string, unknown>) => ({
+        description: m.receipt_description as string | null,
+        amountCents: Number(m.amount_cents),
+      }));
+
+    const totalDebtorConsumedCents = debtorConsumptions.reduce(
+      (acc: number, c: { amountCents: number }) => acc + c.amountCents,
+      0,
+    );
+    const totalCreditorConsumedCents = creditorConsumptions.reduce(
+      (acc: number, c: { amountCents: number }) => acc + c.amountCents,
+      0,
+    );
+    const netDebtCents = Math.max(0, totalDebtorConsumedCents - totalCreditorConsumedCents);
+
     const amount = Number(d.amount_cents);
     const confirmed = Number(d.confirmed_cents);
     const reserved = Number(d.reserved_cents);
@@ -295,6 +333,16 @@ export class PagosService {
       receiptId: d.receipt_id,
       receiptDescription: d.receipt_description,
       creditor: d.creditor,
+      creditorId: d.creditor_id,
+      creditorPaymentInfo: {
+        phone: (d.creditor_phone as string) ?? null,
+        preferredWallet: (d.creditor_preferred_wallet as string) ?? 'YAPE',
+        bankName: (d.creditor_bank_name as string) ?? null,
+        accountNumber: (d.creditor_account_number as string) ?? null,
+        cci: (d.creditor_cci as string) ?? null,
+        hasQr: Boolean(d.creditor_has_qr),
+        qrUrl: d.creditor_has_qr ? `/api/auth/users/${d.creditor_id}/qr` : null,
+      },
       debtor: d.debtor,
       amountCents: amount,
       confirmedCents: confirmed,
@@ -314,6 +362,13 @@ export class PagosService {
         resolvedAt: p.resolved_at,
         hasEvidence: Boolean(p.evidence_path),
       })),
+      eventBreakdown: {
+        totalDebtorConsumedCents,
+        totalCreditorConsumedCents,
+        netDebtCents,
+        debtorConsumptions,
+        creditorConsumptions,
+      },
     };
   }
 

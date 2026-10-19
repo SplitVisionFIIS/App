@@ -56,3 +56,12 @@ export function subirImagenEvento(eventoId: string, archivo: File): Promise<{ ha
   form.append('image', archivo);
   return subir<{ hasImage: boolean }>(urlImagenEvento(eventoId), form);
 }
+
+export function compensarSaldosEvento(
+  eventoId: string,
+): Promise<{ eventId: string; compensatedCents: number; pairsCompensated: number }> {
+  return enviar<{ eventId: string; compensatedCents: number; pairsCompensated: number }>(
+    `/api/events/${eventoId}/compensate`,
+    {},
+  );
+}

@@ -330,22 +330,142 @@ export class EventosService {
       [eventId],
     );
 
+    const mappedParticipants = participants.map((r: Record<string, unknown>) => ({
+      userId: r.id,
+      username: r.username,
+      paidCents: Number(r.paid_cents),
+      debtCents: Number(r.debt_cents),
+      receivedCents: Number(r.received_cents),
+      netCents: Number(r.received_cents) - Number(r.debt_cents),
+      underReviewCents: Number(r.pending_payment_cents),
+    }));
+
+    // El monto neto pendiente para saldar el evento es la suma de los saldos netos positivos
+    // (el dinero real que debe transferirse entre participantes para que todos queden en cero).
+    const netOutstandingCents = mappedParticipants.reduce((acc: number, p: { netCents: number }) => {
+      return p.netCents > 0 ? acc + p.netCents : acc;
+    }, 0);
+
     return {
-      participants: participants.map((r: Record<string, unknown>) => ({
-        userId: r.id,
-        username: r.username,
-        paidCents: Number(r.paid_cents),
-        debtCents: Number(r.debt_cents),
-        receivedCents: Number(r.received_cents),
-        netCents: Number(r.received_cents) - Number(r.debt_cents),
-        underReviewCents: Number(r.pending_payment_cents),
-      })),
+      participants: mappedParticipants,
       totals: {
         spentCents: Number(totals[0].spent_cents),
         settledCents: Number(totals[0].settled_cents),
         underReviewCents: Number(totals[0].under_review_cents),
-        outstandingCents: Number(totals[0].outstanding_cents),
+        outstandingCents: netOutstandingCents,
+        grossOutstandingCents: Number(totals[0].outstanding_cents),
       },
     };
+  }
+
+  async compensateCrossDebts(eventId: string, actorId: string) {
+    await this.assertParticipant(eventId, actorId);
+
+    return withTx(this.dataSource, async (em) => {
+      const rawDebts = await em.query(
+        `SELECT id, debtor_id, creditor_id, amount_cents, confirmed_cents, reserved_cents
+         FROM debts
+         WHERE event_id = $1 AND (amount_cents - confirmed_cents - reserved_cents) > 0
+         ORDER BY created_at ASC
+         FOR UPDATE`,
+        [eventId],
+      );
+
+      type DebtRow = {
+        id: string;
+        debtor_id: string;
+        creditor_id: string;
+        amount_cents: number;
+        confirmed_cents: number;
+        reserved_cents: number;
+        available: number;
+      };
+
+      const debtList: DebtRow[] = rawDebts.map((r: Record<string, unknown>) => ({
+        id: r.id as string,
+        debtor_id: r.debtor_id as string,
+        creditor_id: r.creditor_id as string,
+        amount_cents: Number(r.amount_cents),
+        confirmed_cents: Number(r.confirmed_cents),
+        reserved_cents: Number(r.reserved_cents),
+        available: Number(r.amount_cents) - Number(r.confirmed_cents) - Number(r.reserved_cents),
+      }));
+
+      const userIds = [...new Set(debtList.flatMap((d) => [d.debtor_id, d.creditor_id]))];
+      let totalCompensated = 0;
+      let compensationsCount = 0;
+
+      for (let i = 0; i < userIds.length; i++) {
+        for (let j = i + 1; j < userIds.length; j++) {
+          const uA = userIds[i];
+          const uB = userIds[j];
+
+          const debtsAtoB = debtList.filter((d) => d.debtor_id === uA && d.creditor_id === uB && d.available > 0);
+          const debtsBtoA = debtList.filter((d) => d.debtor_id === uB && d.creditor_id === uA && d.available > 0);
+
+          const sumAtoB = debtsAtoB.reduce((acc, d) => acc + d.available, 0);
+          const sumBtoA = debtsBtoA.reduce((acc, d) => acc + d.available, 0);
+
+          const maxComp = Math.min(sumAtoB, sumBtoA);
+          if (maxComp <= 0) continue;
+
+          let remA = maxComp;
+          for (const d of debtsAtoB) {
+            if (remA <= 0) break;
+            const take = Math.min(d.available, remA);
+            d.available -= take;
+            d.confirmed_cents += take;
+            remA -= take;
+
+            await em.query(
+              `UPDATE debts SET confirmed_cents = confirmed_cents + $2 WHERE id = $1`,
+              [d.id, take],
+            );
+            await em.query(
+              `INSERT INTO payments (debt_id, payer_id, amount_cents, method, reference, status, idempotency_key, created_at, resolved_at)
+               VALUES ($1, $2, $3, 'OTRO', 'COMPENSACION', 'CONFIRMADO', $4, now(), now())`,
+              [d.id, d.debtor_id, take, `comp-${d.id.slice(0, 8)}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`],
+            );
+          }
+
+          let remB = maxComp;
+          for (const d of debtsBtoA) {
+            if (remB <= 0) break;
+            const take = Math.min(d.available, remB);
+            d.available -= take;
+            d.confirmed_cents += take;
+            remB -= take;
+
+            await em.query(
+              `UPDATE debts SET confirmed_cents = confirmed_cents + $2 WHERE id = $1`,
+              [d.id, take],
+            );
+            await em.query(
+              `INSERT INTO payments (debt_id, payer_id, amount_cents, method, reference, status, idempotency_key, created_at, resolved_at)
+               VALUES ($1, $2, $3, 'OTRO', 'COMPENSACION', 'CONFIRMADO', $4, now(), now())`,
+              [d.id, d.debtor_id, take, `comp-${d.id.slice(0, 8)}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`],
+            );
+          }
+
+          totalCompensated += maxComp;
+          compensationsCount++;
+        }
+      }
+
+      if (totalCompensated > 0) {
+        await audit(em, {
+          userId: actorId,
+          operation: 'event.debts.compensate',
+          resource: `event:${eventId}`,
+          result: 'ok',
+        });
+      }
+
+      return {
+        eventId,
+        compensatedCents: totalCompensated,
+        pairsCompensated: compensationsCount,
+      };
+    });
   }
 }

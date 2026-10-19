@@ -120,8 +120,12 @@ export class JobsProcessor {
       }
 
       if (payload) {
-        await this.complete(job, payload);
-        return;
+        try {
+          await this.complete(job, payload);
+          return;
+        } catch (e) {
+          error = e;
+        }
       }
 
       const message = describeError(error);

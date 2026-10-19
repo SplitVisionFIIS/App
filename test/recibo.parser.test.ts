@@ -39,6 +39,95 @@ describe('parseRecetaTexto', () => {
     expect(Math.round((suma + p.tax + p.tip - p.discount) * 100)).toBe(Math.round(p.total * 100));
   });
 
+  test('extrae ítems de boletas estándar sin separador pipe (formato común peruano)', () => {
+    const texto = [
+      'POLLERIA EL SABORCITO S.A.C.',
+      'RUC: 20601234567',
+      '1 Pollo a la Brasa con Papas 65.00',
+      '2x Gaseosa Inka Kola 1.5L 12.00 24.00',
+      'Porcion Anticuchos 28.00',
+      'CONSUMO: S/ 117.00',
+      'TOTAL: S/ 117.00',
+    ].join('\n');
+
+    const p = parseRecetaTexto(texto);
+    expect(p.total).toBe(117);
+    expect(p.items).toEqual([
+      { description: 'Pollo a la Brasa con Papas', quantity: 1, unit_price: 65 },
+      { description: 'Gaseosa Inka Kola 1.5L', quantity: 2, unit_price: 12 },
+      { description: 'Porcion Anticuchos', quantity: 1, unit_price: 28 },
+    ]);
+  });
+
+  test('ignora metadatos de cabecera como RUC, Pedido, Mesa y extrae ítems correctamente', () => {
+    const texto = [
+      'POLLERIA CORRALITO',
+      'RUC: 20601169761',
+      'DOM FISCAL: AV SAN FELIPE 151',
+      'LOCAL: Av. Perez Aranibar 1875',
+      'Pedido : 0040200533',
+      'Fecha Emisión 23/07/2026 19:06:30',
+      'Mesa 4',
+      '1/2 Pollo + Papas + En 1 47.50 47.50',
+      'Gaseosa 1 Lt 1 11.00 11.00',
+      'Sub Total: S/ 58.50',
+      'Importe Total: S/ 58.50',
+      'FORMA DE PAGO CONTADO',
+    ].join('\n');
+
+    const p = parseRecetaTexto(texto);
+    expect(p.total).toBe(58.50);
+    expect(p.items).toEqual([
+      { description: '1/2 Pollo Papas En', quantity: 1, unit_price: 47.50 },
+      { description: 'Gaseosa 1 Lt', quantity: 1, unit_price: 11.00 },
+    ]);
+    expect(p.bestEffort).toBeFalsy();
+  });
+
+  test('fusiona descripciones de ítems que ocupan 2 filas', () => {
+    const texto = [
+      'POLLERIA CORRALITO',
+      'RUC: 20601169761',
+      '1/2 Pollo + Papas + En 1 47.50 47.50',
+      'salada',
+      'Gaseosa 1 Lt 1 11.00 11.00',
+      'TOTAL: S/ 58.50',
+    ].join('\n');
+
+    const p = parseRecetaTexto(texto);
+    expect(p.total).toBe(58.50);
+    expect(p.items).toEqual([
+      { description: '1/2 Pollo Papas En salada', quantity: 1, unit_price: 47.50 },
+      { description: 'Gaseosa 1 Lt', quantity: 1, unit_price: 11.00 },
+    ]);
+  });
+
+  test('fusiona ítems cuando el precio aparece en la primera fila y la continuación en la segunda', () => {
+    const texto = [
+      'RESTAURANTE EL ENCUENTRO',
+      '1 Pollo a la Brasa con Papas 65.00',
+      'fritas crocantes con salsa tártara y ensalada fresca',
+      '1 Ceviche Mixto Especial 45.00',
+      'con Choclo desgranado y Camote glaseado',
+      'TOTAL: S/ 110.00',
+    ].join('\n');
+
+    const p = parseRecetaTexto(texto);
+    expect(p.total).toBe(110.00);
+    expect(p.items).toEqual([
+      {
+        description: 'Pollo a la Brasa con Papas fritas crocantes con salsa tártara y ensalada fresca',
+        quantity: 1,
+        unit_price: 65.00,
+      },
+      {
+        description: 'Ceviche Mixto Especial con Choclo desgranado y Camote glaseado',
+        quantity: 1,
+        unit_price: 45.00,
+      },
+    ]);
+  });
+
   test('reconcilia un importe con el punto decimal perdido (1950 -> 19.50)', () => {
     const texto = [
       'LA CASONA GOURMET',

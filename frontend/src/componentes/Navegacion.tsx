@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { deudas } from '../api/consultas';
 import { misInvitaciones } from '../api/eventos';
 import { useSesion } from '../auth/SesionContext';
+import { formatCentavos } from '../i18n/formato';
 import { Logo } from './Logo';
 
 function Icono({ children, className = 'h-5 w-5' }: { children: ReactNode; className?: string }) {
@@ -62,13 +63,6 @@ const IconoSalir = () => (
   </Icono>
 );
 
-const IconoBillete = () => (
-  <Icono>
-    <circle cx="12" cy="12" r="3" />
-    <path d="M3 7v10M21 7v10M7 3h10M7 21h10" />
-  </Icono>
-);
-
 const IconoDocumento = () => (
   <Icono>
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -76,16 +70,89 @@ const IconoDocumento = () => (
   </Icono>
 );
 
-function tituloDeRuta(camino: string): { titulo: string; seccion: string } {
-  if (camino === '/') return { titulo: 'Mis eventos', seccion: 'Panel principal' };
-  if (camino === '/eventos/nuevo') return { titulo: 'Crear nuevo evento', seccion: 'Eventos' };
-  if (camino.startsWith('/eventos/') && camino.includes('/balance')) return { titulo: 'Balance del evento', seccion: 'Eventos' };
-  if (camino.startsWith('/eventos/') && camino.includes('/comprobantes')) return { titulo: 'Comprobantes del evento', seccion: 'Eventos' };
-  if (camino.startsWith('/eventos/')) return { titulo: 'Detalle del evento', seccion: 'Eventos' };
-  if (camino.startsWith('/deudas')) return { titulo: 'Mis deudas & saldos', seccion: 'Finanzas' };
-  if (camino.startsWith('/bandeja')) return { titulo: 'Bandeja de notificaciones', seccion: 'Mensajes' };
-  if (camino.startsWith('/configuracion')) return { titulo: 'Configuración y perfil', seccion: 'Ajustes' };
-  return { titulo: 'SplitVision', seccion: 'App' };
+function rutaContexto(camino: string): { migas: string[]; titulo: string; seccion: string } {
+  if (camino === '/') {
+    return {
+      migas: ['SplitVision', 'Inicio'],
+      titulo: 'Mis Grupos y Eventos',
+      seccion: 'Cuentas compartidas',
+    };
+  }
+  if (camino === '/eventos/nuevo') {
+    return {
+      migas: ['Eventos', 'Nuevo'],
+      titulo: 'Crear Nuevo Evento',
+      seccion: 'Configura un grupo de gasto',
+    };
+  }
+  if (camino.startsWith('/eventos/') && camino.includes('/comprobantes/nuevo')) {
+    return {
+      migas: ['Evento', 'Comprobantes', 'Subir'],
+      titulo: 'Escanear Comprobante',
+      seccion: 'Lectura OCR inteligente',
+    };
+  }
+  if (camino.startsWith('/eventos/') && camino.includes('/comprobantes')) {
+    return {
+      migas: ['Evento', 'Comprobantes'],
+      titulo: 'Comprobantes del Grupo',
+      seccion: 'Historial de gastos registrados',
+    };
+  }
+  if (camino.startsWith('/eventos/') && camino.includes('/balance')) {
+    return {
+      migas: ['Evento', 'Balance'],
+      titulo: 'Balance y Liquidación',
+      seccion: 'Quién le paga a quién',
+    };
+  }
+  if (camino.startsWith('/eventos/')) {
+    return {
+      migas: ['Eventos', 'Detalle'],
+      titulo: 'Panel del Evento',
+      seccion: 'Gastos, participantes y saldos',
+    };
+  }
+  if (camino.startsWith('/comprobantes/') && camino.includes('/reparto')) {
+    return {
+      migas: ['Comprobante', 'Reparto'],
+      titulo: 'Asignación de Consumos',
+      seccion: 'División equitativa o por ítems',
+    };
+  }
+  if (camino.startsWith('/comprobantes/')) {
+    return {
+      migas: ['Comprobante', 'Revisión'],
+      titulo: 'Revisión de Comprobante',
+      seccion: 'Detalle de ítems y montos',
+    };
+  }
+  if (camino.startsWith('/deudas')) {
+    return {
+      migas: ['Finanzas', 'Saldos'],
+      titulo: 'Mis Deudas y Cobros',
+      seccion: 'Liquidaciones pendientes con amigos',
+    };
+  }
+  if (camino.startsWith('/bandeja')) {
+    return {
+      migas: ['Actividad', 'Bandeja'],
+      titulo: 'Bandeja de Notificaciones',
+      seccion: 'Invitaciones y comprobantes por confirmar',
+    };
+  }
+  if (camino.startsWith('/configuracion')) {
+    return {
+      migas: ['Cuenta', 'Ajustes'],
+      titulo: 'Configuración de Perfil',
+      seccion: 'Datos personales y preferencias',
+    };
+  }
+  return {
+    migas: ['SplitVision'],
+    titulo: 'SplitVision',
+    seccion: 'Cuentas claras',
+  };
 }
 
 function ItemSidebar({
@@ -106,27 +173,27 @@ function ItemSidebar({
       to={to}
       end={end}
       className={({ isActive }) =>
-        `group relative flex items-center gap-3.5 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-150 ${
+        `group relative flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-150 active:scale-[0.98] ${
           isActive
-            ? 'bg-white/12 text-white shadow-xs font-bold'
-            : 'text-sobre-barra/70 hover:bg-white/8 hover:text-sobre-barra'
+            ? 'bg-primario-suave/80 text-primario font-bold shadow-2xs ring-1 ring-primario/25'
+            : 'text-texto-suave hover:bg-superficie-2 hover:text-texto'
         }`
       }
     >
       {({ isActive }) => (
         <>
           <span
-            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors ${
               isActive
-                ? 'bg-acento text-sobre-acento'
-                : 'text-sobre-barra/70 group-hover:text-sobre-barra group-hover:bg-white/5'
+                ? 'bg-primario text-sobre-primario shadow-2xs'
+                : 'text-texto-suave group-hover:bg-superficie-3 group-hover:text-texto'
             }`}
           >
             {children}
           </span>
           <span className="truncate">{etiqueta}</span>
           {insignia && insignia > 0 ? (
-            <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-acento px-1.5 text-[11px] font-bold leading-none text-sobre-acento shadow-xs">
+            <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-acento px-1 text-[10px] font-bold leading-none text-sobre-acento shadow-2xs">
               {insignia}
             </span>
           ) : null}
@@ -140,19 +207,38 @@ function BarraLateral() {
   const { usuario, hasImage, fotoUrl, cerrar } = useSesion();
   const pendientes = useQuery({ queryKey: ['invitaciones'], queryFn: misInvitaciones });
   const insignia = pendientes.data?.length ?? 0;
+  const deudasPendientes = useQuery({
+    queryKey: ['debts', 'owing'],
+    queryFn: () => deudas({ direction: 'owing' }),
+  });
+  const deudasPorCobrar = useQuery({
+    queryKey: ['debts', 'owed'],
+    queryFn: () => deudas({ direction: 'owed' }),
+  });
+  const deboBruto = (deudasPendientes.data ?? []).reduce(
+    (acc, d) => acc + (d.pendingCents || 0),
+    0,
+  );
+  const meDebenBruto = (deudasPorCobrar.data ?? []).reduce(
+    (acc, d) => acc + (d.pendingCents || 0),
+    0,
+  );
+  // El saldo neto que el usuario debe transferir en total
+  const totalDebo = Math.max(0, deboBruto - meDebenBruto);
 
   const inicial = (usuario ?? 'U').charAt(0).toUpperCase();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col justify-between border-r border-white/10 bg-barra text-sobre-barra shadow-2xl md:flex">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col justify-between border-r border-borde/80 bg-superficie text-texto shadow-xs md:flex transition-colors">
       {/* Zona Superior */}
-      <div className="flex flex-col gap-6 p-5">
+      <div className="flex flex-col gap-5 p-4">
         {/* Identidad / Marca */}
-        <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center justify-between pt-1 px-1">
           <Link to="/" className="transition-transform hover:scale-[1.02]" aria-label="SplitVision — inicio">
-            <Logo tam={34} texto={true} sobre="oscuro" />
+            <Logo tam={28} texto={true} sobre="claro" />
           </Link>
-          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-acento">
+          <span className="inline-flex items-center gap-1 rounded-full border border-primario/20 bg-primario-suave/40 px-2 py-0.5 text-[10px] font-mono font-bold text-primario">
+            <span className="h-1.5 w-1.5 rounded-full bg-primario animate-pulse" />
             v1.0
           </span>
         </div>
@@ -160,7 +246,7 @@ function BarraLateral() {
         {/* Botón rápido Crear evento */}
         <Link
           to="/eventos/nuevo"
-          className="group flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primario-500 to-primario-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-primario-900/40 transition-all hover:from-primario-600 hover:to-primario-700 hover:shadow-md active:scale-[0.98]"
+          className="group flex items-center justify-center gap-2 rounded-xl bg-primario px-3.5 py-2.5 text-xs font-bold text-sobre-primario shadow-2xs transition-[background-color,transform] hover:bg-primario-fuerte active:scale-[0.98]"
         >
           <IconoMas className="h-4 w-4 transition-transform group-hover:rotate-90 duration-200" />
           <span>Crear nuevo evento</span>
@@ -169,8 +255,8 @@ function BarraLateral() {
         {/* Menú de Navegación */}
         <nav className="flex flex-col gap-5">
           <div>
-            <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-sobre-barra/40">
-              Principal
+            <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-texto-tenue">
+              Espacio Social
             </p>
             <div className="flex flex-col gap-1">
               <ItemSidebar to="/" end etiqueta="Mis eventos">
@@ -186,8 +272,8 @@ function BarraLateral() {
           </div>
 
           <div>
-            <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-sobre-barra/40">
-              Preferencias
+            <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-texto-tenue">
+              Ajustes de Cuenta
             </p>
             <div className="flex flex-col gap-1">
               <ItemSidebar to="/configuracion" etiqueta="Configuración">
@@ -199,29 +285,36 @@ function BarraLateral() {
       </div>
 
       {/* Zona Inferior: Perfil de usuario y Logout */}
-      <div className="border-t border-white/10 p-4">
-        <div className="flex items-center justify-between gap-3 rounded-xl bg-white/5 p-2.5">
+      <div className="border-t border-borde-suave p-3">
+        <div className="flex items-center justify-between gap-2.5 rounded-xl border border-borde bg-superficie-2/50 p-2">
           <Link
             to="/configuracion"
-            className="flex min-w-0 items-center gap-2.5 transition-opacity hover:opacity-90"
+            className="flex min-w-0 flex-1 items-center gap-2.5 transition-opacity hover:opacity-85"
           >
             {hasImage && fotoUrl ? (
               <img
                 src={fotoUrl}
                 alt="Avatar"
-                className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-white/15"
+                className="h-8 w-8 shrink-0 rounded-lg object-cover ring-1 ring-borde"
               />
             ) : (
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primario-suave text-sm font-bold text-primario shadow-inner">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-primario/20 bg-primario-suave font-mono text-xs font-bold text-primario">
                 {inicial}
               </span>
             )}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-bold text-white">{usuario || 'Usuario'}</p>
-              <p className="flex items-center gap-1.5 text-[10px] text-exito font-medium">
-                <span className="h-1.5 w-1.5 rounded-full bg-exito animate-pulse" />
-                En línea
-              </p>
+              <p className="truncate text-xs font-bold text-texto">{usuario || 'Usuario'}</p>
+              {totalDebo > 0 ? (
+                <p className="flex items-center gap-1 text-[10px] font-semibold text-aviso">
+                  <span className="h-1.5 w-1.5 rounded-full bg-aviso animate-pulse" />
+                  Debes {formatCentavos(totalDebo)}
+                </p>
+              ) : (
+                <p className="flex items-center gap-1 text-[10px] font-medium text-exito">
+                  <span className="h-1.5 w-1.5 rounded-full bg-exito" />
+                  Cuentas al día
+                </p>
+              )}
             </div>
           </Link>
 
@@ -230,7 +323,7 @@ function BarraLateral() {
             onClick={() => void cerrar()}
             title="Cerrar sesión"
             aria-label="Cerrar sesión"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-sobre-barra/60 transition-colors hover:bg-peligro/20 hover:text-peligro focus:outline-none"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-texto-tenue transition-[background-color,color,transform] hover:bg-peligro-suave/40 hover:text-peligro active:scale-90 focus:outline-none"
           >
             <IconoSalir />
           </button>
@@ -245,27 +338,42 @@ function BarraSuperior() {
   const { usuario, hasImage, fotoUrl } = useSesion();
   const pendientes = useQuery({ queryKey: ['invitaciones'], queryFn: misInvitaciones });
   const insignia = pendientes.data?.length ?? 0;
-  const { titulo, seccion } = tituloDeRuta(ubicacion.pathname);
+  const { migas, titulo, seccion } = rutaContexto(ubicacion.pathname);
 
   const inicial = (usuario ?? 'U').charAt(0).toUpperCase();
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-borde/70 bg-superficie/85 px-4 backdrop-blur-md sm:px-8">
+    <header className="sticky top-0 z-20 flex h-14 w-full items-center justify-between border-b border-borde/80 bg-superficie/90 px-4 backdrop-blur-md sm:px-8 transition-colors">
       {/* Título contextual / Migas */}
-      <div className="flex flex-col">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-texto-tenue">
-          {seccion}
-        </span>
-        <span className="text-base font-bold text-texto sm:text-lg">{titulo}</span>
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 flex-col">
+          <div className="flex items-center gap-2">
+            {/* Breadcrumbs */}
+            <div className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-texto-suave">
+              {migas.map((m, idx) => (
+                <span key={idx} className="flex items-center gap-1.5">
+                  <span className={idx === migas.length - 1 ? 'font-bold text-texto' : 'hover:text-texto'}>
+                    {m}
+                  </span>
+                  {idx < migas.length - 1 ? <span className="text-texto-tenue">/</span> : null}
+                </span>
+              ))}
+            </div>
+            <span className="sm:hidden max-w-[200px] truncate text-sm font-bold tracking-tight text-texto">{titulo}</span>
+          </div>
+          <span className="hidden sm:block text-[11px] font-semibold text-texto-suave">
+            {titulo} · <span className="font-normal text-texto-tenue">{seccion}</span>
+          </span>
+        </div>
       </div>
 
       {/* Utilidades derechas */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
         {/* Notificaciones */}
         <Link
           to="/bandeja"
           title="Bandeja de notificaciones"
-          className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-borde bg-superficie text-texto-suave shadow-2xs transition-colors hover:border-borde/90 hover:bg-superficie-2 hover:text-texto active:scale-95"
+          className="relative flex h-8 w-8 items-center justify-center rounded-xl border border-borde bg-superficie text-texto-suave shadow-2xs transition-[background-color,transform] hover:bg-superficie-2 hover:text-texto active:scale-95"
         >
           <IconoCampana />
           {insignia > 0 ? (
@@ -278,16 +386,16 @@ function BarraSuperior() {
         {/* Perfil directo */}
         <Link
           to="/configuracion"
-          className="flex items-center gap-2 rounded-xl border border-borde bg-superficie p-1.5 shadow-2xs transition-colors hover:border-borde/90 hover:bg-superficie-2 active:scale-95"
+          className="flex items-center gap-2 rounded-xl border border-borde bg-superficie p-1 shadow-2xs transition-[background-color,transform] hover:bg-superficie-2 active:scale-95"
         >
           {hasImage && fotoUrl ? (
-            <img src={fotoUrl} alt="" className="h-7 w-7 rounded-lg object-cover" />
+            <img src={fotoUrl} alt="" className="h-6 w-6 rounded-lg object-cover" />
           ) : (
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primario-suave text-xs font-bold text-primario">
+            <span className="flex h-6 w-6 items-center justify-center rounded-lg border border-primario/20 bg-primario-suave font-mono text-[11px] font-bold text-primario">
               {inicial}
             </span>
           )}
-          <span className="hidden text-xs font-semibold text-texto sm:inline sm:pr-2">
+          <span className="hidden text-xs font-semibold text-texto sm:inline sm:pr-1.5">
             {usuario}
           </span>
         </Link>
@@ -314,95 +422,63 @@ function EnlaceMovil({
       to={to}
       end={end}
       className={({ isActive }) =>
-        `flex w-16 flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-bold transition-colors ${
-          isActive ? 'text-acento font-extrabold' : 'text-sobre-barra/70 hover:text-sobre-barra'
+        `relative flex flex-1 flex-col items-center justify-center py-1.5 text-[10px] transition-all duration-100 active:scale-95 select-none ${
+          isActive ? 'text-primario font-bold' : 'text-texto-suave hover:text-texto font-medium'
         }`
       }
     >
-      <span className="relative flex h-6 w-6 items-center justify-center">
-        {children}
-        {insignia && insignia > 0 ? (
-          <span className="absolute -right-1.5 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-acento px-1 text-[9px] font-bold text-sobre-acento">
-            {insignia}
+      {({ isActive }) => (
+        <>
+          {isActive ? (
+            <span className="absolute top-0 h-0.5 w-6 rounded-full bg-primario" />
+          ) : null}
+          <span className="relative flex h-5 w-5 items-center justify-center">
+            {children}
+            {insignia && insignia > 0 ? (
+              <span className="absolute -right-2 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-acento px-1 text-[9px] font-bold text-sobre-acento shadow-2xs">
+                {insignia}
+              </span>
+            ) : null}
           </span>
-        ) : null}
-      </span>
-      <span>{etiqueta}</span>
+          <span className="mt-1 truncate tracking-tight">{etiqueta}</span>
+        </>
+      )}
     </NavLink>
   );
 }
 
 function BarraInferior() {
-  const { cerrar } = useSesion();
-  const navegar = useNavigate();
   const pendientes = useQuery({ queryKey: ['invitaciones'], queryFn: misInvitaciones });
   const insignia = pendientes.data?.length ?? 0;
-  const [abierto, setAbierto] = useState(false);
-
-  const irAccion = (ruta: string) => {
-    setAbierto(false);
-    navegar(ruta);
-  };
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 flex items-end justify-around border-t border-white/10 bg-barra/95 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur-xl md:hidden shadow-2xl">
-      <EnlaceMovil to="/" end etiqueta="Inicio">
+    <nav
+      aria-label="Navegación móvil"
+      className="fixed inset-x-0 bottom-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-bottom,0px))] items-center justify-around border-t border-borde/80 bg-superficie/95 px-2 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur-xl md:hidden transition-colors shadow-sm"
+    >
+      <EnlaceMovil to="/" end etiqueta="Eventos">
         <IconoCasa />
       </EnlaceMovil>
       <EnlaceMovil to="/deudas" etiqueta="Deudas">
         <IconoDocumento />
       </EnlaceMovil>
+      <NavLink
+        to="/eventos/nuevo"
+        className={({ isActive }) =>
+          `relative flex flex-1 flex-col items-center justify-center py-1 transition-all duration-100 active:scale-95 select-none ${
+            isActive ? 'text-primario font-bold' : 'text-texto-suave font-medium'
+          }`
+        }
+      >
+        <span className="flex h-7 w-10 items-center justify-center rounded-full bg-primario text-sobre-primario shadow-2xs">
+          <IconoMas className="h-4 w-4" />
+        </span>
+        <span className="mt-0.5 text-[10px] tracking-tight">Nuevo</span>
+      </NavLink>
       <EnlaceMovil to="/bandeja" etiqueta="Bandeja" insignia={insignia}>
         <IconoBandeja />
       </EnlaceMovil>
-
-      <div className="relative flex flex-col items-center">
-        <button
-          type="button"
-          onClick={() => setAbierto((v) => !v)}
-          aria-label="Acciones rápidas"
-          aria-expanded={abierto}
-          className={`-mt-9 flex h-14 w-14 items-center justify-center rounded-full bg-acento text-sobre-acento shadow-lg shadow-acento/40 transition-transform duration-150 active:scale-95 ${
-            abierto ? 'rotate-45' : ''
-          }`}
-        >
-          <span className="h-7 w-7 text-sobre-acento">
-            <IconoMas />
-          </span>
-        </button>
-        {abierto ? (
-          <div className="absolute bottom-[4.5rem] z-40 w-52 rounded-2xl border border-borde bg-superficie/98 p-2 shadow-2xl backdrop-blur-lg">
-            <button
-              type="button"
-              onClick={() => irAccion('/eventos/nuevo')}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-texto hover:bg-superficie-2 transition-colors"
-            >
-              <span className="text-primario">
-                <IconoMas />
-              </span>
-              Crear evento
-            </button>
-            <button
-              type="button"
-              onClick={() => irAccion('/deudas')}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-texto hover:bg-superficie-2 transition-colors"
-            >
-              <IconoBillete />
-              Realizar pago
-            </button>
-            <button
-              type="button"
-              onClick={() => void cerrar()}
-              className="mt-1 flex w-full items-center gap-3 rounded-xl border-t border-borde-suave px-3 py-2.5 text-left text-sm font-semibold text-peligro hover:bg-peligro-suave/30 transition-colors"
-            >
-              <IconoSalir />
-              Cerrar sesión
-            </button>
-          </div>
-        ) : null}
-      </div>
-
-      <EnlaceMovil to="/configuracion" etiqueta="Ajustes">
+      <EnlaceMovil to="/configuracion" etiqueta="Perfil">
         <IconoEngranaje />
       </EnlaceMovil>
     </nav>
@@ -415,7 +491,7 @@ export function Navegacion({ children }: { children: ReactNode }) {
       <BarraLateral />
       <div className="pb-24 md:pb-8 md:pl-64">
         <BarraSuperior />
-        <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           {children}
         </main>
       </div>
