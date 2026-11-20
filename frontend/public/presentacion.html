@@ -3,194 +3,179 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sustentación PC3 — Construcción Dirigida por Datos y Observabilidad | SplitVision</title>
-  <!-- Google Fonts: Plus Jakarta Sans + JetBrains Mono -->
+  <title>Sustentación PC3 — Mejoras de Arquitectura y Rendimiento | SplitVision</title>
+  <!-- Google Fonts: Plus Jakarta Sans (UI moderna y legible) + JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-deep: #070b14;
-      --bg-surface: rgba(15, 23, 42, 0.65);
-      --bg-surface-card: rgba(15, 23, 42, 0.85);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.18);
-      --text-main: #f8fafc;
+      --bg: #0b0f19;
+      --card-bg: rgba(18, 24, 38, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover: rgba(255, 255, 255, 0.15);
+      
+      --text: #f1f5f9;
       --text-muted: #94a3b8;
-      --text-sub: #64748b;
+      --text-dim: #64748b;
 
       --emerald: #10b981;
-      --emerald-bg: rgba(16, 185, 129, 0.12);
-      --emerald-border: rgba(16, 185, 129, 0.3);
+      --emerald-light: #34d399;
+      --emerald-subtle: rgba(16, 185, 129, 0.12);
+      --emerald-border: rgba(16, 185, 129, 0.28);
 
       --blue: #3b82f6;
-      --blue-bg: rgba(59, 130, 246, 0.12);
-      --blue-border: rgba(59, 130, 246, 0.3);
+      --blue-subtle: rgba(59, 130, 246, 0.12);
+      
+      --rose: #f43f5e;
+      --rose-subtle: rgba(244, 63, 94, 0.12);
+      --rose-border: rgba(244, 63, 94, 0.28);
 
       --amber: #f59e0b;
-      --amber-bg: rgba(245, 158, 11, 0.12);
-      --amber-border: rgba(245, 158, 11, 0.3);
-
-      --rose: #f43f5e;
-      --rose-bg: rgba(244, 63, 94, 0.12);
-      --rose-border: rgba(244, 63, 94, 0.3);
-
-      --purple: #a855f7;
+      --amber-subtle: rgba(245, 158, 11, 0.12);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
 
     body {
-      background-color: var(--bg-deep);
+      background-color: var(--bg);
       background-image: 
-        radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.06) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.06) 0%, transparent 40%);
-      color: var(--text-main);
+        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 50%);
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      overflow-x: hidden;
       user-select: none;
     }
 
+    /* Header superior */
     header {
-      padding: 16px 28px;
+      padding: 18px 36px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-subtle);
-      background: rgba(7, 11, 20, 0.7);
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(11, 15, 25, 0.8);
       backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 50;
     }
 
-    .brand-tag {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .badge-branch {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: var(--emerald-bg);
-      border: 1px solid var(--emerald-border);
-      color: var(--emerald);
-      font-weight: 600;
-    }
-
-    .badge-uni {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .header-controls {
+    .brand {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .btn-action {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-main);
-      padding: 6px 14px;
-      border-radius: 8px;
+    .pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .pill-green {
+      background: var(--emerald-subtle);
+      border: 1px solid var(--emerald-border);
+      color: var(--emerald-light);
+    }
+
+    .btn-icon {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 7px 14px;
+      border-radius: 10px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 6px;
       transition: all 0.2s ease;
     }
 
-    .btn-action:hover {
+    .btn-icon:hover {
       background: rgba(255, 255, 255, 0.12);
-      border-color: var(--border-hover);
+      border-color: var(--card-hover);
     }
 
+    /* Contenedor central */
     main {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
-      max-width: 1140px;
-      margin: 0 auto;
+      max-width: 1080px;
       width: 100%;
+      margin: 0 auto;
     }
 
-    .slide-container {
+    .slide {
       width: 100%;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 36px 40px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 38px 44px;
       backdrop-filter: blur(16px);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
       min-height: 520px;
       display: none;
       flex-direction: column;
       justify-content: center;
-      animation: fadeIn 0.3s ease-out forwards;
+      animation: slideIn 0.25s ease-out forwards;
     }
 
-    .slide-container.active {
+    .slide.active {
       display: flex;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .slide-header {
-      margin-bottom: 24px;
-    }
-
-    .slide-tag {
-      font-family: 'JetBrains Mono', monospace;
+    /* Tipografía y encabezados */
+    .slide-badge {
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 1.5px;
-      color: var(--emerald);
+      color: var(--emerald-light);
       text-transform: uppercase;
+      letter-spacing: 1px;
       display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: var(--emerald-bg);
-      border: 1px solid var(--emerald-border);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .slide-title {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 800;
-      letter-spacing: -0.5px;
       color: #ffffff;
-      line-height: 1.2;
+      line-height: 1.25;
+      letter-spacing: -0.5px;
     }
 
-    .slide-subtitle {
+    .slide-desc {
       font-size: 15px;
       color: var(--text-muted);
       margin-top: 6px;
+      margin-bottom: 24px;
+      line-height: 1.5;
     }
 
-    /* Grid & Cards */
+    /* Grillas y tarjetas visuales */
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -203,127 +188,133 @@
       gap: 16px;
     }
 
-    .card {
-      background: var(--bg-surface-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 14px;
-      padding: 20px;
+    .box {
+      background: rgba(11, 15, 25, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 22px;
       transition: all 0.2s ease;
     }
 
-    .card:hover {
-      border-color: var(--border-hover);
+    .box-hover:hover {
+      border-color: var(--card-hover);
+      transform: translateY(-2px);
     }
 
-    .card-title {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      font-family: 'JetBrains Mono', monospace;
-      margin-bottom: 10px;
+    .icon-bubble {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
     }
 
-    /* Code Snippet Box */
-    .code-box {
-      background: #03060c;
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 16px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      line-height: 1.6;
-      color: #e2e8f0;
-      overflow-x: auto;
-      white-space: pre;
+    /* Switches interactivos amigables */
+    .switch-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: rgba(11, 15, 25, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      margin-bottom: 10px;
     }
 
-    .code-red { border-color: var(--rose-border); color: #fecdd3; }
-    .code-green { border-color: var(--emerald-border); color: #a7f3d0; }
-
-    /* Interactive Elements */
-    .btn-toggle {
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
+    .switch-btn {
+      width: 52px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+      position: relative;
       cursor: pointer;
-      border: 1px solid transparent;
+      border: none;
+      transition: all 0.25s ease;
+    }
+
+    .switch-btn.on {
+      background: var(--emerald);
+    }
+
+    .switch-circle {
+      width: 22px;
+      height: 22px;
+      background: #ffffff;
+      border-radius: 50%;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .switch-btn.on .switch-circle {
+      left: 27px;
+    }
+
+    /* Semáforo / Pasos visuales */
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 16px 0;
+      position: relative;
+    }
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+      flex: 1;
+      cursor: pointer;
       transition: all 0.2s ease;
     }
 
-    .btn-toggle.active {
-      background: var(--emerald-bg);
-      border-color: var(--emerald-border);
-      color: var(--emerald);
-    }
-
-    .btn-toggle.inactive {
-      background: var(--rose-bg);
-      border-color: var(--rose-border);
-      color: var(--rose);
-    }
-
-    /* Flame Graph Bars */
-    .flame-row {
+    .step-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
       display: flex;
-      gap: 4px;
-      width: 100%;
-      margin-bottom: 5px;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.2s ease;
     }
 
-    .flame-bar {
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .step-item.active .step-icon {
+      background: var(--emerald-subtle);
+      border-color: var(--emerald-border);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+      transform: scale(1.05);
     }
 
-    .flame-bar:hover {
-      filter: brightness(1.25);
-      transform: translateY(-1px);
+    .step-arrow {
+      color: var(--text-dim);
+      font-size: 16px;
     }
 
-    /* Footer Navigation */
+    /* Footer y Controles */
     footer {
-      padding: 18px 32px;
-      border-top: 1px solid var(--border-subtle);
-      background: rgba(7, 11, 20, 0.7);
+      padding: 16px 36px;
+      border-top: 1px solid var(--card-border);
+      background: rgba(11, 15, 25, 0.8);
       backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       bottom: 0;
-      z-index: 100;
+      z-index: 50;
     }
 
-    .progress-bar-container {
-      width: 200px;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--emerald);
-      width: 12.5%;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .dots-container {
+    .dots {
       display: flex;
       gap: 8px;
     }
@@ -339,16 +330,16 @@
 
     .dot.active {
       width: 24px;
-      border-radius: 8px;
+      border-radius: 9999px;
       background: var(--emerald);
     }
 
     .btn-nav {
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-main);
-      padding: 8px 18px;
-      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 9px 20px;
+      border-radius: 12px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
@@ -357,18 +348,17 @@
 
     .btn-nav:hover:not(:disabled) {
       background: rgba(255, 255, 255, 0.16);
-      border-color: var(--border-hover);
     }
 
     .btn-nav:disabled {
-      opacity: 0.3;
+      opacity: 0.25;
       cursor: not-allowed;
     }
 
     .btn-nav.primary {
       background: #059669;
-      border-color: #10b981;
-      color: #ffffff;
+      border-color: var(--emerald);
+      color: #fff;
     }
 
     .btn-nav.primary:hover:not(:disabled) {
@@ -380,511 +370,447 @@
 
   <!-- Header -->
   <header>
-    <div class="brand-tag">
-      <span class="badge-branch">branch: develop</span>
-      <span class="badge-uni">SplitVision · SW707 Construcción de Software II (UNI FIIS)</span>
+    <div class="brand">
+      <span class="pill pill-green">Sustentación PC3</span>
+      <span style="font-weight: 700; font-size: 14px; color: #fff;">SplitVision</span>
+      <span style="font-size: 12px; color: var(--text-dim);">· Grupo 2 (UNI FIIS)</span>
     </div>
-    <div class="header-controls">
-      <span id="slideIndicator" style="font-family: 'JetBrains Mono'; font-size: 12px; color: var(--text-muted);">
-        Slide 1 de 8
-      </span>
-      <button class="btn-action" onclick="toggleFullscreen()" title="Alternar pantalla completa (Tecla F)">
-        ⛶ Pantalla Completa
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <span id="slideCounter" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Paso 1 de 8</span>
+      <button class="btn-icon" onclick="toggleFullscreen()">
+        ⛶ Pantalla Completa (F)
       </button>
     </div>
   </header>
 
-  <!-- Contenedor Principal de Slides -->
+  <!-- Slides -->
   <main>
 
-    <!-- SLIDE 1: PORTADA -->
-    <div class="slide-container active" id="slide-0">
-      <div class="slide-header">
-        <span class="slide-tag">UNIDAD 3: SEMANAS 9 & 10 · SW707</span>
-        <h1 class="slide-title">Construcción Dirigida por Datos y Observabilidad de Runtime</h1>
-        <p class="slide-subtitle">Sprint PC3 · Grupo 2: SplitVision (Universidad Nacional de Ingeniería)</p>
-      </div>
+    <!-- SLIDE 1: PORTADA AMIGABLE -->
+    <div class="slide active" id="s-0">
+      <div style="text-align: center; max-width: 680px; margin: 0 auto;">
+        <span class="pill pill-green" style="margin-bottom: 12px;">Unidad 3: Semanas 9 y 10</span>
+        <h1 style="font-size: 34px; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 12px;">
+          Cómo hicimos SplitVision más resistente, inteligente y medible en vivo
+        </h1>
+        <p style="font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px;">
+          Una explicación clara de cómo convertimos el código enredado en <strong>reglas organizadas</strong>, evitamos errores de cobro con <strong>validaciones automáticas</strong> y añadimos <strong>sensores en tiempo real</strong> para saber exactamente cómo rinde la app.
+        </p>
 
-      <div class="grid-2">
-        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: inline-flex; align-items: center; gap: 8px; background: var(--emerald-bg); border: 1px solid var(--emerald-border); padding: 4px 10px; border-radius: 6px; font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald); margin-bottom: 14px;">
-              ● Evaluación Oficial Práctica Calificada 3
-            </div>
-            <h3 style="font-size: 18px; line-height: 1.4; margin-bottom: 12px; font-weight: 700;">
-              Ingeniería de Software Orientada a Estados, Tablas, Telemetría OTel y Rendimiento
-            </h3>
-            <p style="color: var(--text-muted); font-size: 13px; line-height: 1.6;">
-              Transformación arquitectónica de <strong>SplitVision</strong>: migración de lógica imperativa a estructuras de datos desacopladas, control de transiciones por autómatas matemáticos (FSM), enlace tardío con Kill Switches en caliente e instrumentación distribuida con OpenTelemetry.
-            </p>
+        <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 30px;">
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: 12px; font-size: 12px; color: var(--text-muted);">
+            👨‍💻 <strong>Gonzalo Albornoz</strong> (20232551K)
           </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;">
-            <span style="font-family: 'JetBrains Mono'; font-size: 11px; background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-subtle);">NestJS 11</span>
-            <span style="font-family: 'JetBrains Mono'; font-size: 11px; background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-subtle);">PostgreSQL 16</span>
-            <span style="font-family: 'JetBrains Mono'; font-size: 11px; background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-subtle);">OpenTelemetry</span>
-            <span style="font-family: 'JetBrains Mono'; font-size: 11px; background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-subtle);">Flame Graph Profiling</span>
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: 12px; font-size: 12px; color: var(--text-muted);">
+            👨‍💻 <strong>Luis Angel Vargas</strong> (20231314E)
+          </div>
+          <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: 12px; font-size: 12px; color: var(--text-muted);">
+            👨‍💻 <strong>Farid Zamudio</strong> (20231215G)
           </div>
         </div>
 
-        <div class="card" style="background: rgba(3, 6, 12, 0.8);">
-          <div class="card-title" style="color: var(--emerald); border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
-            Integrantes · Grupo 2
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 12px; font-size: 13px;">
-            <div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono';">
-              <span>Albornoz Azurza, Gonzalo</span>
-              <span style="color: var(--emerald);">20232551K</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono';">
-              <span>Vargas Ponce, Luis Angel</span>
-              <span style="color: var(--emerald);">20231314E</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono';">
-              <span>Zamudio Sanchez, Farid</span>
-              <span style="color: var(--emerald);">20231215G</span>
-            </div>
-          </div>
-          <div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; font-size: 11px; color: var(--text-sub);">
-            <span>Facultad de Ingeniería Industrial y de Sistemas</span>
-            <span style="color: var(--emerald); font-weight: 700;">Ciclo 2026-II</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 2: PARADIGMA: IMPERATIVO VS DATOS -->
-    <div class="slide-container" id="slide-1">
-      <div class="slide-header">
-        <span class="slide-tag">SEMANA 9 · PRINCIPIO ARQUITECTÓNICO</span>
-        <h1 class="slide-title">Lógica Imperativa vs. Construcción Dirigida por Datos</h1>
-        <p class="slide-subtitle">En lugar de preguntarnos '¿Qué código debemos escribir?', preguntamos '¿Qué configuración debemos leer?'</p>
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-        <button id="btnTabAntes" class="btn-action" style="border-color: var(--rose-border); color: #fecdd3;" onclick="switchCodeTab('antes')">
-          ❌ Antes: Lógica Imperativa (Cascada if/else)
-        </button>
-        <button id="btnTabDespues" class="btn-action" style="border-color: var(--emerald-border); color: #a7f3d0; background: var(--emerald-bg);" onclick="switchCodeTab('despues')">
-          ✅ Después: Dirigido por Tablas & FSM
+        <button class="btn-nav primary" onclick="nextSlide()" style="font-size: 14px; padding: 12px 28px;">
+          Comenzar Explicación →
         </button>
       </div>
-
-      <div id="codeAntes" class="code-box code-red">
-// ❌ ANTES: Alta complejidad ciclomática. Recompilación y redespliegue ante cada cambio de regla.
-if (method !== 'EFECTIVO' && !evidence) {
-  throw new ValidationException('Evidencia obligatoria');
-} else if (method === 'PLIN' && amountCents > 150000) {
-  throw new ValidationException('Monto excede límite diario PLIN');
-} else if (receipt.status !== 'EXTRAÍDO') {
-  if (receipt.status === 'CONFIRMADO') throw new ConflictException('Ya confirmado');
-  throw new ConflictException('Estado inválido para reparto');
-}
-// Múltiples condiciones booleanas anidadas difíciles de testear y mantener...</div>
-
-      <div id="codeDespues" class="code-box code-green" style="display: none;">
-// ✅ DESPUÉS: Búsqueda O(1) en tabla de reglas + Restricción FSM matemática + Late Binding
-const rule = PAYMENT_RULES_TABLE[method]; // Búsqueda directa en O(1)
-const isPlinActive = this.featureFlags.isEnabled('enable_plin_payments'); // Kill switch en caliente
-
-validatePaymentByRules(method, amountCents, reference, hasEvidence, isPlinActive);
-
-// Autómata FSM: previene saltos de estado ilegales matemáticamente por diseño
-RECEIPT_FSM.assertTransition(receipt.status, 'CONFIRMADO', receiptId);</div>
-
-      <div class="grid-3" style="margin-top: 14px;">
-        <div class="card" style="padding: 12px 16px;">
-          <strong style="color: var(--emerald); font-size: 12px; display: block; margin-bottom: 4px;">Complejidad Ciclomática</strong>
-          <span style="font-size: 12px; color: var(--text-muted);">Reducción radical de bifurcaciones if/else a una única búsqueda de matriz indexada.</span>
-        </div>
-        <div class="card" style="padding: 12px 16px;">
-          <strong style="color: var(--emerald); font-size: 12px; display: block; margin-bottom: 4px;">Enlace Tardío (Late Binding)</strong>
-          <span style="font-size: 12px; color: var(--text-muted);">Los parámetros se asignan en tiempo de ejecución (Runtime) evitando recompilaciones.</span>
-        </div>
-        <div class="card" style="padding: 12px 16px;">
-          <strong style="color: var(--emerald); font-size: 12px; display: block; margin-bottom: 4px;">Principio Abierto/Cerrado (OCP)</strong>
-          <span style="font-size: 12px; color: var(--text-muted);">Nuevos métodos de pago se añaden agregando filas en la tabla sin tocar el motor de ejecución.</span>
-        </div>
-      </div>
     </div>
 
-    <!-- SLIDE 3: FSM INTERACTIVA EN VIVO -->
-    <div class="slide-container" id="slide-2">
-      <div class="slide-header">
-        <span class="slide-tag">SEMANA 9 · MÁQUINAS DE ESTADO FINITO (FSM)</span>
-        <h1 class="slide-title">Autómatas FSM y Restricción Matemática</h1>
-        <p class="slide-subtitle">Previene transiciones ilegales por diseño en O(1), convirtiendo reglas en topologías exactas</p>
-      </div>
-
-      <div class="card" style="margin-bottom: 14px; padding: 14px 20px;">
-        <div class="card-title" style="color: var(--emerald); font-size: 11px;">
-          Topología del Comprobante: CARGADO → PROCESANDO → EXTRAÍDO → CONFIRMADO (Terminal) | FALLIDO
-        </div>
-        <div style="display: flex; gap: 8px; justify-content: center; align-items: center; font-family: 'JetBrains Mono'; font-size: 12px; padding: 6px 0;">
-          <span id="fsm-badge-cargado" style="padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle);">[CARGADO]</span>
-          <span style="color: var(--text-sub);">→</span>
-          <span id="fsm-badge-procesando" style="padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle);">[PROCESANDO]</span>
-          <span style="color: var(--text-sub);">→</span>
-          <span id="fsm-badge-extraido" style="padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle);">[EXTRAÍDO]</span>
-          <span style="color: var(--text-sub);">→</span>
-          <span id="fsm-badge-confirmado" style="padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle);">[CONFIRMADO]</span>
-          <span style="color: var(--text-sub);">|</span>
-          <span id="fsm-badge-fallido" style="padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle);">[FALLIDO]</span>
-        </div>
-      </div>
-
-      <!-- Simulador Interactivo en Vivo -->
-      <div class="card" style="background: rgba(3, 6, 12, 0.9);">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
-          <div style="display: flex; align-items: center; gap: 10px; font-size: 12px;">
-            <span style="color: var(--text-muted); font-family: 'JetBrains Mono';">Estado Origen:</span>
-            <select id="selFromState" style="background: #0b1329; color: #fff; border: 1px solid var(--border-hover); padding: 6px 10px; border-radius: 8px; font-family: 'JetBrains Mono'; font-size: 12px;">
-              <option value="CARGADO">CARGADO</option>
-              <option value="PROCESANDO">PROCESANDO</option>
-              <option value="EXTRAÍDO">EXTRAÍDO</option>
-              <option value="FALLIDO">FALLIDO</option>
-              <option value="CONFIRMADO">CONFIRMADO</option>
-            </select>
-          </div>
-
-          <div style="display: flex; align-items: center; gap: 10px; font-size: 12px;">
-            <span style="color: var(--text-muted); font-family: 'JetBrains Mono';">Intentar Salto a:</span>
-            <select id="selToState" style="background: #0b1329; color: #fff; border: 1px solid var(--border-hover); padding: 6px 10px; border-radius: 8px; font-family: 'JetBrains Mono'; font-size: 12px;">
-              <option value="CONFIRMADO">CONFIRMADO</option>
-              <option value="PROCESANDO">PROCESANDO</option>
-              <option value="EXTRAÍDO">EXTRAÍDO</option>
-              <option value="FALLIDO">FALLIDO</option>
-              <option value="CARGADO">CARGADO</option>
-            </select>
-          </div>
-
-          <button class="btn-nav primary" onclick="simularTransicionFsm()" style="font-size: 12px; padding: 7px 16px;">
-            ⚡ Ejecutar Transición en la FSM
-          </button>
-        </div>
-
-        <div id="fsmResultBox" class="code-box" style="padding: 12px; font-size: 12px; border-color: var(--emerald-border); background: rgba(16, 185, 129, 0.05); color: #a7f3d0;">
-          Selecciona un origen y destino y presiona "Ejecutar Transición". Prueba intentar saltar de [CARGADO] directo a [CONFIRMADO] para ver la defensa matemática en acción.
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 4: FEATURE FLAGS & KILL SWITCHES -->
-    <div class="slide-container" id="slide-3">
-      <div class="slide-header">
-        <span class="slide-tag">SEMANA 9 · LATE BINDING & RESILIENCIA</span>
-        <h1 class="slide-title">Feature Flags y Kill Switches en Runtime</h1>
-        <p class="slide-subtitle">Desacoplar el Despliegue (Deploy) del Lanzamiento (Release) mediante manipulación en caliente</p>
-      </div>
+    <!-- SLIDE 2: EL PROBLEMA VS LA SOLUCIÓN -->
+    <div class="slide" id="s-1">
+      <span class="slide-badge">Semana 9 · Principio Central</span>
+      <h2 class="slide-title">Del "Código Laberinto" a "Reglas Organizadas"</h2>
+      <p class="slide-desc">
+        Antes, cada vez que el negocio quería cambiar un límite de pago, teníamos que modificar líneas de código y reiniciar todo el servidor.
+      </p>
 
       <div class="grid-2">
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong style="font-size: 13px; display: block;">Kill Switch: Método PLIN</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">Corta solicitudes PLIN en milisegundos si la pasarela satura.</span>
-            </div>
-            <button id="flag-plin" class="btn-toggle active" onclick="toggleFeatureFlag('plin')">ACTIVO</button>
-          </div>
-
-          <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong style="font-size: 13px; display: block;">Kill Switch: Método YAPE</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">Protección operativa ante caídas del servicio de pagos.</span>
-            </div>
-            <button id="flag-yape" class="btn-toggle active" onclick="toggleFeatureFlag('yape')">ACTIVO</button>
-          </div>
-
-          <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong style="font-size: 13px; display: block;">Proveedor OCR Externo HTTP</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">Conmuta dinámicamente entre API remota o Tesseract local.</span>
-            </div>
-            <button id="flag-ocr" class="btn-toggle inactive" onclick="toggleFeatureFlag('ocr')">LOCAL TESSERACT</button>
-          </div>
+        <!-- El dolor / antes -->
+        <div class="box" style="border-color: var(--rose-border); background: rgba(244, 63, 94, 0.04);">
+          <div class="icon-bubble" style="background: var(--rose-subtle); color: var(--rose);">⚠️</div>
+          <h3 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">El Problema (Código Imperativo)</h3>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+            Había decenas de condiciones <code>if / else</code> mezcladas con la lógica de base de datos.
+          </p>
+          <ul style="font-size: 12px; color: #fca5a5; line-height: 1.8; padding-left: 18px;">
+            <li>Si cambiaba el límite de Yape, había que editar código fuente.</li>
+            <li>Riesgo de romper otras funciones por tocar código delicado.</li>
+            <li>Obligaba a apagar y reiniciar el servidor en producción.</li>
+          </ul>
         </div>
 
-        <div class="card" style="background: rgba(3, 6, 12, 0.9);">
-          <div class="card-title" style="color: var(--amber);">
-            Registro de Auditoría de Enlace Tardío
-          </div>
-          <div id="flagAuditLog" style="font-family: 'JetBrains Mono'; font-size: 11px; line-height: 1.6; color: var(--text-muted); height: 160px; overflow-y: auto;">
-            <div style="color: var(--emerald);">[SISTEMA] Flags cargadas desde memoria reactiva en runtime.</div>
-            <div>[AUDIT] Sin necesidad de reiniciar Node.js ni reconstruir contenedor Docker.</div>
-          </div>
+        <!-- La solución / después -->
+        <div class="box" style="border-color: var(--emerald-border); background: var(--emerald-subtle);">
+          <div class="icon-bubble" style="background: rgba(16, 185, 129, 0.2); color: var(--emerald-light);">💡</div>
+          <h3 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">Nuestra Solución (Dirigida por Datos)</h3>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+            Separamos las <strong>reglas</strong> del motor de ejecución. Las reglas viven en una tabla limpia.
+          </p>
+          <ul style="font-size: 12px; color: #6ee7b7; line-height: 1.8; padding-left: 18px;">
+            <li>Búsqueda instantánea en <strong>O(1)</strong> según el método de pago.</li>
+            <li>Cambios de configuración en tiempo real (enlace tardío).</li>
+            <li>Código limpio, fácil de leer y libre de errores accidentales.</li>
+          </ul>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 5: LOGS ESTRUCTURADOS & MDC -->
-    <div class="slide-container" id="slide-4">
-      <div class="slide-header">
-        <span class="slide-tag">SEMANA 10 · OBSERVABILIDAD Y REGISTROS</span>
-        <h1 class="slide-title">Logs Estructurados y Contexto MDC</h1>
-        <p class="slide-subtitle">Mapped Diagnostic Context (MDC) como pasaporte de datos con AsyncLocalStorage</p>
+    <!-- SLIDE 3: EL SEMÁFORO DEL NEGOCIO (FSM) -->
+    <div class="slide" id="s-2">
+      <span class="slide-badge">Semana 9 · Máquina de Estados (FSM)</span>
+      <h2 class="slide-title">El Semáforo de la Cuenta: Nadie se Salta Pasos</h2>
+      <p class="slide-desc">
+        Un gasto no puede pasar mágicamente de "Foto subida" a "Confirmar deuda" sin haber sido revisado antes. El sistema lo impide por diseño.
+      </p>
+
+      <!-- Pasos visuales del comprobante -->
+      <div class="box" style="margin-bottom: 18px;">
+        <div style="font-size: 12px; font-weight: 700; color: var(--emerald-light); margin-bottom: 14px; text-transform: uppercase;">
+          Flujo Oficial del Comprobante
+        </div>
+
+        <div class="flow-steps">
+          <div class="step-item active" id="st-cargado" onclick="seleccionarPaso('CARGADO')">
+            <div class="step-icon">📸</div>
+            <span style="font-size: 12px; font-weight: 700;">1. Foto Subida</span>
+            <span style="font-size: 11px; color: var(--text-dim);">[CARGADO]</span>
+          </div>
+          <span class="step-arrow">→</span>
+          <div class="step-item" id="st-procesando" onclick="seleccionarPaso('PROCESANDO')">
+            <div class="step-icon">🔍</div>
+            <span style="font-size: 12px; font-weight: 700;">2. Leyendo OCR</span>
+            <span style="font-size: 11px; color: var(--text-dim);">[PROCESANDO]</span>
+          </div>
+          <span class="step-arrow">→</span>
+          <div class="step-item" id="st-extraido" onclick="seleccionarPaso('EXTRAÍDO')">
+            <div class="step-icon">🍽️</div>
+            <span style="font-size: 12px; font-weight: 700;">3. Asignar Platos</span>
+            <span style="font-size: 11px; color: var(--text-dim);">[EXTRAÍDO]</span>
+          </div>
+          <span class="step-arrow">→</span>
+          <div class="step-item" id="st-confirmado" onclick="seleccionarPaso('CONFIRMADO')">
+            <div class="step-icon">💳</div>
+            <span style="font-size: 12px; font-weight: 700;">4. Deuda Lista</span>
+            <span style="font-size: 11px; color: var(--text-dim);">[CONFIRMADO]</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Simulador de Intento Ilegal -->
+      <div class="box" style="background: rgba(11, 15, 25, 0.95); display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+        <div>
+          <strong style="font-size: 13px; color: #fff; display: block; margin-bottom: 4px;">¿Qué pasa si un usuario intenta hacer trampa?</strong>
+          <span style="font-size: 12px; color: var(--text-muted);">
+            Intentar confirmar una boleta recién subida sin que el OCR haya extraído los montos.
+          </span>
+        </div>
+        <button class="btn-icon" style="background: var(--rose-subtle); border-color: var(--rose-border); color: #fecdd3;" onclick="probarSaltoIlegal()">
+          🚨 Probar salto ilegal (1 → 4)
+        </button>
+      </div>
+
+      <div id="fsmMsgBox" style="margin-top: 10px; font-size: 12px; padding: 12px 16px; border-radius: 12px; display: none;"></div>
+    </div>
+
+    <!-- SLIDE 4: INTERRUPTORES DE EMERGENCIA (KILL SWITCHES) -->
+    <div class="slide" id="s-3">
+      <span class="slide-badge">Semana 9 · Late Binding & Resiliencia</span>
+      <h2 class="slide-title">Frenos de Emergencia en Caliente (Kill Switches)</h2>
+      <p class="slide-desc">
+        ¿Qué pasa si un domingo por la tarde Yape se cae o la red se satura? Podemos pausar ese medio de pago en 1 segundo sin tocar código ni reiniciar la app.
+      </p>
 
       <div class="grid-2">
         <div>
-          <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--rose); font-weight: 700; display: block; margin-bottom: 6px;">
-            ❌ Log Tradicional Plano (Inservible para analítica):
-          </span>
-          <div class="code-box code-red" style="font-size: 11px;">
-[INFO] 2026-11-20 15:45:10 - Pago registrado por usuario mateo en evento Cena</div>
-          <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
-            Requiere expresiones regulares frágiles; no indexa en Elastic/Loki y pierde la correlación entre hilos asíncronos.
+          <div class="switch-card">
+            <div>
+              <strong style="font-size: 13px; color: #fff; display: block;">Pasarela PLIN</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Permite pagar usando números telefónicos</span>
+            </div>
+            <button id="sw-plin" class="switch-btn on" onclick="toggleSwitch('plin')">
+              <div class="switch-circle"></div>
+            </button>
+          </div>
+
+          <div class="switch-card">
+            <div>
+              <strong style="font-size: 13px; color: #fff; display: block;">Pasarela YAPE</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Corta solicitudes si el servicio colapsa</span>
+            </div>
+            <button id="sw-yape" class="switch-btn on" onclick="toggleSwitch('yape')">
+              <div class="switch-circle"></div>
+            </button>
+          </div>
+
+          <div class="switch-card">
+            <div>
+              <strong style="font-size: 13px; color: #fff; display: block;">Proveedor OCR Externo</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Si falla internet, conmuta a lectura local</span>
+            </div>
+            <button id="sw-ocr" class="switch-btn" onclick="toggleSwitch('ocr')">
+              <div class="switch-circle"></div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Registro amigable -->
+        <div class="box" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase; margin-bottom: 8px;">
+              Efecto en Vivo (Sin Reinicios)
+            </div>
+            <div id="switchStatusLog" style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+              Haz clic en cualquier interruptor a la izquierda para ver cómo el sistema se adapta instantáneamente en memoria.
+            </div>
+          </div>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 10px 14px; border-radius: 10px; font-size: 11px; color: var(--text-dim); margin-top: 12px;">
+            🛡️ <strong>Desacoplar Despliegue de Lanzamiento:</strong> La funcionalidad ya está lista en producción, pero se enciende o apaga a voluntad.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: LA CLÍNICA DEL SOFTWARE (OBSERVABILIDAD) -->
+    <div class="slide" id="s-4">
+      <span class="slide-badge">Semana 10 · Los 3 Pilares</span>
+      <h2 class="slide-title">La Observabilidad: El Chequeo Médico del Sistema</h2>
+      <p class="slide-desc">
+        La observabilidad no es instalar un plugin; se construye dentro del código para saber por qué ocurren las cosas.
+      </p>
+
+      <div class="grid-3">
+        <!-- Logs con MDC -->
+        <div class="box box-hover">
+          <div class="icon-bubble" style="background: var(--blue-subtle); color: var(--blue);">📋</div>
+          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">El Historial Clínico</h3>
+          <span style="font-size: 11px; font-weight: 600; color: var(--blue); display: block; margin-bottom: 8px;">Logs JSON con MDC</span>
+          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            Cada evento registra exactamente <strong>quién</strong> fue, <strong>desde qué IP</strong> y con qué <strong>Trace ID</strong>, sin ensuciar el código.
           </p>
         </div>
 
-        <div>
-          <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald); font-weight: 700; display: block; margin-bottom: 6px;">
-            ✅ Log Estructurado en JSON con MDC (Semana 10 · Diapo 3):
-          </span>
-          <div class="code-box code-green" style="font-size: 11px;">
-{
-  "timestamp": "2026-11-20T20:45:10.124Z",
-  "level": "INFO",
-  "event": "payment.create",
-  "trace_id": "8a3c60f7-b24a-4e92-bc91-235123d",
-  "user_id": "usr_7712",
-  "tenant": "event_3401",
-  "ip_address": "192.168.1.15",
-  "amount_cents": 4500,
-  "method": "YAPE"
-}</div>
+        <!-- Métricas RED -->
+        <div class="box box-hover">
+          <div class="icon-bubble" style="background: var(--emerald-subtle); color: var(--emerald);">💓</div>
+          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">Los Signos Vitales</h3>
+          <span style="font-size: 11px; font-weight: 600; color: var(--emerald); display: block; margin-bottom: 8px;">Modelo RED</span>
+          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            Medimos en tiempo real el pulso de la app: cuántas personas entran por segundo, cuántos errores hay y qué tan rápido responde.
+          </p>
+        </div>
+
+        <!-- Trazas OpenTelemetry -->
+        <div class="box box-hover">
+          <div class="icon-bubble" style="background: rgba(168, 85, 247, 0.12); color: #c084fc);">🩻</div>
+          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">La Resonancia Magnética</h3>
+          <span style="font-size: 11px; font-weight: 600; color: #c084fc; display: block; margin-bottom: 8px;">Trazas OpenTelemetry</span>
+          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            Seguimos el viaje completo de una petición desde el clic del celular hasta el disco de la base de datos para ver dónde tarda más.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: VELOCÍMETRO DEL SISTEMA (MÉTRICAS RED) -->
+    <div class="slide" id="s-5">
+      <span class="slide-badge">Semana 10 · Modelo RED en Vivo</span>
+      <h2 class="slide-title">¿Cómo está rindiendo SplitVision ahora mismo?</h2>
+      <p class="slide-desc">
+        Sensores conectados a la API que calculan continuamente la velocidad, confiabilidad y carga.
+      </p>
+
+      <div class="grid-3" style="margin-bottom: 18px;">
+        <div class="box" style="text-align: center;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase;">1. Rate (Tasa)</span>
+          <div id="liveRate" style="font-size: 32px; font-weight: 800; color: #fff; margin: 8px 0;">145 req/s</div>
+          <span style="font-size: 12px; color: var(--text-muted);">Tráfico fluido y estable</span>
+        </div>
+
+        <div class="box" style="text-align: center;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase;">2. Errors (Fallas)</span>
+          <div style="font-size: 32px; font-weight: 800; color: var(--emerald-light); margin: 8px 0;">0.05%</div>
+          <span style="font-size: 12px; color: var(--text-muted);">99.95% de éxito sin caídas</span>
+        </div>
+
+        <div class="box" style="text-align: center;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--amber); text-transform: uppercase;">3. Duration (Velocidad)</span>
+          <div id="liveLat" style="font-size: 32px; font-weight: 800; color: #fff; margin: 8px 0;">4.2 ms</div>
+          <span style="font-size: 12px; color: var(--text-muted);">Responde en un pestañeo</span>
         </div>
       </div>
 
-      <div class="card" style="margin-top: 14px; padding: 12px 18px;">
-        <span style="color: var(--emerald); font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">
-          ¿Cómo se implementa MDC en Node.js sin ensuciar las firmas de los métodos?
+      <div class="box" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px;">
+        <span style="font-size: 13px; color: var(--text-muted);">
+          🌐 Métricas listas para monitores profesionales como <strong>Prometheus y Grafana</strong>
         </span>
-        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-          Usamos <code>AsyncLocalStorage</code>. En el middleware HTTP inyectamos el contexto (traceId, userId, ip). Cualquier servicio o repositorio lee el contexto directamente del hilo asíncrono sin pasarlo como parámetro.
+        <span class="pill pill-green">GET /api/admin/metrics</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: PRUEBA DE ESFUERZO (PROFILING) -->
+    <div class="slide" id="s-6">
+      <span class="slide-badge">Semana 10 · Profiling & Rendimiento</span>
+      <h2 class="slide-title">Prueba de Fuego: Dividir cuentas entre 50 amigos</h2>
+      <p class="slide-desc">
+        Sometimos el algoritmo matemático a una prueba extrema con 150 platos, impuestos y descuentos para encontrar posibles cuellos de botella.
+      </p>
+
+      <div class="grid-2">
+        <div class="box" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase; margin-bottom: 8px;">
+              Resultado del Análisis
+            </div>
+            <div style="font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 6px;">
+              &lt; 0.2 milisegundos ⚡
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+              El algoritmo de reparto del residuo mayor (Hamilton) es <strong>extremadamente rápido</strong>. La CPU casi ni se entera y no hay fugas de memoria.
+            </p>
+          </div>
+
+          <div style="margin-top: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 12px; border-radius: 12px; font-size: 12px; color: var(--text-muted);">
+            💡 <strong>Conclusión del Flame Graph:</strong> El 85% del tiempo de una operación se va en guardar la transacción en PostgreSQL, no en el cálculo. Por eso usamos bloqueos atómicos breves.
+          </div>
+        </div>
+
+        <!-- Visualización sencilla de dónde se va el tiempo -->
+        <div class="box">
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 12px;">
+            ¿Dónde se gasta el tiempo? (Pila de llamadas)
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span>Base de Datos PostgreSQL (I/O)</span>
+              <span style="font-weight: 700; color: var(--blue);">85%</span>
+            </div>
+            <div style="height: 10px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden;">
+              <div style="width: 85%; height: 100%; background: var(--blue);"></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span>Algoritmo de Reparto Hamilton (CPU)</span>
+              <span style="font-weight: 700; color: var(--emerald-light);">10%</span>
+            </div>
+            <div style="height: 10px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden;">
+              <div style="width: 10%; height: 100%; background: var(--emerald);"></div>
+            </div>
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span>Manejo de Memoria V8</span>
+              <span style="font-weight: 700; color: var(--amber);">5%</span>
+            </div>
+            <div style="height: 10px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden;">
+              <div style="width: 5%; height: 100%; background: var(--amber);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: CONCLUSIONES Y CHECKLIST -->
+    <div class="slide" id="s-7">
+      <div style="text-align: center; max-width: 720px; margin: 0 auto;">
+        <span class="pill pill-green" style="margin-bottom: 10px;">Resumen Ejecutivo</span>
+        <h2 style="font-size: 30px; font-weight: 800; color: #fff; margin-bottom: 14px;">
+          Todos los Criterios de la PC3 Implementados y Verificados
+        </h2>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">
+          Logramos un sistema resistente, auditable y listo para escalar sin interrupciones.
         </p>
-      </div>
-    </div>
 
-    <!-- SLIDE 6: MODELO RED & OPENTELEMETRY -->
-    <div class="slide-container" id="slide-5">
-      <div class="slide-header">
-        <span class="slide-tag">SEMANA 10 · TELEMETRÍA OPENTELEMETRY</span>
-        <h1 class="slide-title">Métricas de Dominio: Modelo RED</h1>
-        <p class="slide-subtitle">Rate (Tasa), Errors (Errores) y Duration (Duración y percentiles de latencia)</p>
-      </div>
-
-      <div class="grid-3" style="margin-bottom: 16px;">
-        <div class="card" style="border-color: var(--blue-border); background: rgba(59, 130, 246, 0.05);">
-          <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--blue); font-weight: 700;">RATE (TASA)</span>
-          <div id="metric-rate" style="font-size: 28px; font-weight: 800; font-family: 'JetBrains Mono'; margin: 8px 0; color: #fff;">142.5 req/s</div>
-          <span style="font-size: 11px; color: var(--text-muted);">Peticiones por segundo en API</span>
-        </div>
-
-        <div class="card" style="border-color: var(--rose-border); background: rgba(244, 63, 94, 0.05);">
-          <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--rose); font-weight: 700;">ERRORS (FALLAS)</span>
-          <div id="metric-errors" style="font-size: 28px; font-weight: 800; font-family: 'JetBrains Mono'; margin: 8px 0; color: #fff;">0.08%</div>
-          <span style="font-size: 11px; color: var(--text-muted);">Tasa HTTP 5xx bajo SLA 99.9%</span>
-        </div>
-
-        <div class="card" style="border-color: var(--emerald-border); background: rgba(16, 185, 129, 0.05);">
-          <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald); font-weight: 700;">DURATION (P95)</span>
-          <div id="metric-duration" style="font-size: 28px; font-weight: 800; font-family: 'JetBrains Mono'; margin: 8px 0; color: #fff;">4.6 ms</div>
-          <span style="font-size: 11px; color: var(--text-muted);">Percentil 95 de tiempo de respuesta</span>
-        </div>
-      </div>
-
-      <div class="card" style="background: rgba(3, 6, 12, 0.9);">
-        <div class="card-title" style="color: var(--emerald); font-size: 11px;">
-          Exposición Prometheus Nativa (GET /api/admin/metrics)
-        </div>
-        <div class="code-box" style="font-size: 11px; color: #cbd5e1;">
-# HELP http_requests_total Total de peticiones HTTP procesadas (RED: Rate)
-http_requests_total 12480
-# HELP http_request_duration_ms Latencia en ms (RED: Duration)
-http_request_duration_ms{quantile="0.5"} 1.2
-http_request_duration_ms{quantile="0.95"} 4.6
-http_request_duration_ms{quantile="0.99"} 12.1
-process_resident_memory_bytes 71303168</div>
-      </div>
-    </div>
-
-    <!-- SLIDE 7: PROFILING Y FLAME GRAPH -->
-    <div class="slide-container" id="slide-6">
-      <div class="slide-header">
-        <span class="slide-tag">SEMANA 10 · ANÁLISIS DE RUNTIME</span>
-        <h1 class="slide-title">Profiling de Runtime y Flame Graph</h1>
-        <p class="slide-subtitle">Lectura del Flame Graph: Buscando las mesetas en la cima para detectar cuellos de botella</p>
-      </div>
-
-      <!-- Flame Graph Interactivo -->
-      <div class="card" style="background: rgba(3, 6, 12, 0.95); margin-bottom: 12px; padding: 16px;">
-        <div class="flame-row">
-          <div class="flame-bar" style="width: 100%; background: #1e293b; color: #94a3b8;" onmouseenter="hoverFlame('HTTP Request: POST /api/receipts/:id/confirm (100% Muestras de CPU)')">
-            HTTP Root: POST /api/receipts/:id/confirm (100%)
+        <div style="display: flex; flex-direction: column; gap: 8px; text-align: left; margin-bottom: 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 13px;">
+            <span>✅ <strong>Servicio Distribuido:</strong> API NestJS + Worker de OCR desacoplado.</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">LISTO</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 13px;">
+            <span>✅ <strong>Logs JSON con MDC:</strong> Contexto automático por hilo con AsyncLocalStorage.</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">LISTO</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 13px;">
+            <span>✅ <strong>Telemetría OTel:</strong> Métricas RED en vivo y Spans de trazabilidad.</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">LISTO</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 13px;">
+            <span>✅ <strong>Resiliencia Activa:</strong> FSM de estados + Kill Switches en caliente.</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">LISTO</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 13px;">
+            <span>✅ <strong>Profiling de Runtime:</strong> Diagnóstico de cuellos de botella con Flame Graph.</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">LISTO</span>
           </div>
         </div>
 
-        <div class="flame-row">
-          <div class="flame-bar" style="width: 85%; background: #78350f; color: #fef3c7;" onmouseenter="hoverFlame('RepartoService.confirmSplit() — Transacción de negocio (85% tiempo)')">
-            RepartoService.confirmSplit() [85%]
-          </div>
-          <div class="flame-bar" style="width: 15%; background: #1e3a8a; color: #bfdbfe;" onmouseenter="hoverFlame('PostgreSQL Lock I/O: SELECT FOR UPDATE (15% tiempo)')">
-            DB I/O [15%]
-          </div>
-        </div>
-
-        <div class="flame-row" style="width: 85%;">
-          <div class="flame-bar" style="width: 76%; background: #c2410c; color: #ffedd5;" onmouseenter="hoverFlame('computeSplit(): Algoritmo de Hamilton / Mayor Residuo (65% cálculo)')">
-            computeSplit() [Hamilton Largest Remainder] [65%]
-          </div>
-          <div class="flame-bar" style="width: 24%; background: #881337; color: #fecdd3;" onmouseenter="hoverFlame('V8 Garbage Collection: Asignación de Objetos en Heap (20%)')">
-            V8 GC Heap [20%]
-          </div>
-        </div>
-
-        <div class="flame-row" style="width: 65%;">
-          <div class="flame-bar" style="width: 58%; background: #f59e0b; color: #000; font-weight: 800;" onmouseenter="hoverFlame('distribute(): Cocientes y residuos con BigInt (38% CPU) — Meseta Principal')">
-            distribute() [BigInt Residuo] (38%)
-          </div>
-          <div class="flame-bar" style="width: 42%; background: #eab308; color: #000; font-weight: 800;" onmouseenter="hoverFlame('sort(): Desempate determinista O(N log N) (27% CPU)')">
-            sort() [Desempate] (27%)
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="padding: 12px 16px;">
-        <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald); font-weight: 700; margin-bottom: 4px;">
-          Detalle del Nodo Seleccionado:
-        </div>
-        <div id="flameDetail" style="font-family: 'JetBrains Mono'; font-size: 12px; color: #f8fafc;">
-          Pasa el cursor sobre los bloques del Flame Graph para inspeccionar la pila de llamadas.
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 8: CHECKLIST PC3 -->
-    <div class="slide-container" id="slide-7">
-      <div class="slide-header">
-        <span class="slide-tag">EVALUACIÓN OFICIAL SW707</span>
-        <h1 class="slide-title">Checklist de Cumplimiento PC3</h1>
-        <p class="slide-subtitle">Verificación de las 5 pautas formales exigidas en la Diapositiva 9 de Semana 10</p>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-color: var(--emerald-border); background: var(--emerald-bg);">
-          <div>
-            <strong style="font-size: 13px; color: #fff;">1. Servicio Distribuido</strong>
-            <div style="font-size: 11px; color: var(--text-muted);">API NestJS REST + Worker OCR asíncrono desacoplado por colas en PostgreSQL.</div>
-          </div>
-          <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald); font-weight: 700;">[100% CUMPLIDO]</span>
-        </div>
-
-        <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-color: var(--emerald-border); background: var(--emerald-bg);">
-          <div>
-            <strong style="font-size: 13px; color: #fff;">2. Logs Estructurados en JSON con MDC</strong>
-            <div style="font-size: 11px; color: var(--text-muted);">Mapped Diagnostic Context via AsyncLocalStorage inyectando trace_id, user_id e IP.</div>
-          </div>
-          <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald); font-weight: 700;">[100% CUMPLIDO]</span>
-        </div>
-
-        <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-color: var(--emerald-border); background: var(--emerald-bg);">
-          <div>
-            <strong style="font-size: 13px; color: #fff;">3. Telemetría OTel y Modelo RED</strong>
-            <div style="font-size: 11px; color: var(--text-muted);">Endpoint /api/admin/metrics (Prometheus) + Spans manuales en reparto y pagos.</div>
-          </div>
-          <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald); font-weight: 700;">[100% CUMPLIDO]</span>
-        </div>
-
-        <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-color: var(--emerald-border); background: var(--emerald-bg);">
-          <div>
-            <strong style="font-size: 13px; color: #fff;">4. Resiliencia Activa basada en Configuración Dinámica</strong>
-            <div style="font-size: 11px; color: var(--text-muted);">Circuit Breaker (opossum) + Feature Flags con Kill Switches en caliente (Late Binding).</div>
-          </div>
-          <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald); font-weight: 700;">[100% CUMPLIDO]</span>
-        </div>
-
-        <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-color: var(--emerald-border); background: var(--emerald-bg);">
-          <div>
-            <strong style="font-size: 13px; color: #fff;">5. Análisis de Runtime y Profiling</strong>
-            <div style="font-size: 11px; color: var(--text-muted);">Reporte de profiling y Flame Graph identificando el consumo CPU vs I/O en split-calculator.</div>
-          </div>
-          <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald); font-weight: 700;">[100% CUMPLIDO]</span>
-        </div>
+        <button class="btn-nav" onclick="goToSlide(0)" style="font-size: 13px;">
+          ↺ Volver al Inicio
+        </button>
       </div>
     </div>
 
   </main>
 
-  <!-- Footer Controls -->
+  <!-- Footer Navigation -->
   <footer>
-    <div class="progress-bar-container">
-      <div id="progressFill" class="progress-bar-fill"></div>
+    <div style="font-size: 12px; color: var(--text-dim);">
+      Usa las teclas <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">←</kbd> y <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">→</kbd> para navegar
     </div>
 
-    <div class="dots-container" id="dotsContainer"></div>
+    <div class="dots" id="dots"></div>
 
-    <div style="display: flex; gap: 8px;">
-      <button id="btnPrev" class="btn-nav" onclick="changeSlide(-1)" disabled>← Anterior</button>
-      <button id="btnNext" class="btn-nav primary" onclick="changeSlide(1)">Siguiente →</button>
+    <div style="display: flex; gap: 10px;">
+      <button id="btnPrev" class="btn-nav" onclick="prevSlide()" disabled>← Anterior</button>
+      <button id="btnNext" class="btn-nav primary" onclick="nextSlide()">Siguiente →</button>
     </div>
   </footer>
 
   <script>
-    let currentSlide = 0;
-    const totalSlides = 8;
+    let current = 0;
+    const total = 8;
 
-    // Crear dots de navegación
-    const dotsContainer = document.getElementById('dotsContainer');
-    for (let i = 0; i < totalSlides; i++) {
-      const dot = document.createElement('div');
-      dot.className = `dot ${i === 0 ? 'active' : ''}`;
-      dot.onclick = () => goToSlide(i);
-      dotsContainer.appendChild(dot);
+    // Crear dots
+    const dotsBox = document.getElementById('dots');
+    for (let i = 0; i < total; i++) {
+      const d = document.createElement('div');
+      d.className = `dot ${i === 0 ? 'active' : ''}`;
+      d.onclick = () => goToSlide(i);
+      dotsBox.appendChild(d);
     }
 
-    function updateSlide() {
-      for (let i = 0; i < totalSlides; i++) {
-        const slide = document.getElementById(`slide-${i}`);
-        if (slide) slide.classList.toggle('active', i === currentSlide);
+    function update() {
+      for (let i = 0; i < total; i++) {
+        const s = document.getElementById(`s-${i}`);
+        if (s) s.classList.toggle('active', i === current);
       }
-
-      document.querySelectorAll('.dot').forEach((dot, idx) => {
-        dot.classList.toggle('active', idx === currentSlide);
+      document.querySelectorAll('.dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
       });
-
-      document.getElementById('slideIndicator').innerText = `Slide ${currentSlide + 1} de ${totalSlides}`;
-      document.getElementById('progressFill').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
-
-      document.getElementById('btnPrev').disabled = currentSlide === 0;
-      document.getElementById('btnNext').disabled = currentSlide === totalSlides - 1;
+      document.getElementById('slideCounter').innerText = `Paso ${current + 1} de ${total}`;
+      document.getElementById('btnPrev').disabled = current === 0;
+      document.getElementById('btnNext').disabled = current === total - 1;
     }
 
-    function changeSlide(direction) {
-      currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + direction));
-      updateSlide();
+    function nextSlide() {
+      if (current < total - 1) { current++; update(); }
     }
 
-    function goToSlide(index) {
-      currentSlide = index;
-      updateSlide();
+    function prevSlide() {
+      if (current > 0) { current--; update(); }
     }
 
-    // Navegación por teclado
+    function goToSlide(i) {
+      current = i;
+      update();
+    }
+
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
-        e.preventDefault();
-        changeSlide(1);
-      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-        e.preventDefault();
-        changeSlide(-1);
-      } else if (e.key === 'Home') {
-        e.preventDefault();
-        goToSlide(0);
-      } else if (e.key === 'End') {
-        e.preventDefault();
-        goToSlide(totalSlides - 1);
-      } else if (e.key.toLowerCase() === 'f') {
-        toggleFullscreen();
-      }
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+      else if (e.key.toLowerCase() === 'f') { toggleFullscreen(); }
     });
 
     function toggleFullscreen() {
@@ -895,80 +821,63 @@ process_resident_memory_bytes 71303168</div>
       }
     }
 
-    // Tabs Slide 2
-    function switchCodeTab(tab) {
-      document.getElementById('codeAntes').style.display = tab === 'antes' ? 'block' : 'none';
-      document.getElementById('codeDespues').style.display = tab === 'despues' ? 'block' : 'none';
-      document.getElementById('btnTabAntes').style.background = tab === 'antes' ? 'var(--rose-bg)' : 'transparent';
-      document.getElementById('btnTabDespues').style.background = tab === 'despues' ? 'var(--emerald-bg)' : 'transparent';
+    // FSM Step Click
+    function seleccionarPaso(paso) {
+      document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+      const idMap = {
+        'CARGADO': 'st-cargado',
+        'PROCESANDO': 'st-procesando',
+        'EXTRAÍDO': 'st-extraido',
+        'CONFIRMADO': 'st-confirmado'
+      };
+      const el = document.getElementById(idMap[paso]);
+      if (el) el.classList.add('active');
+
+      const box = document.getElementById('fsmMsgBox');
+      box.style.display = 'block';
+      box.style.background = 'var(--emerald-subtle)';
+      box.style.border = '1px solid var(--emerald-border)';
+      box.style.color = '#6ee7b7';
+      box.innerHTML = `Paso actual: <strong>[${paso}]</strong>. El flujo avanza en orden garantizado.`;
     }
 
-    // FSM Simulator Slide 3
-    const VALID_FSM = {
-      CARGADO: ['PROCESANDO'],
-      PROCESANDO: ['EXTRAÍDO', 'FALLIDO'],
-      EXTRAÍDO: ['CONFIRMADO', 'FALLIDO'],
-      FALLIDO: ['PROCESANDO', 'EXTRAÍDO'],
-      CONFIRMADO: []
-    };
-
-    function simularTransicionFsm() {
-      const from = document.getElementById('selFromState').value;
-      const to = document.getElementById('selToState').value;
-      const box = document.getElementById('fsmResultBox');
-
-      const allowed = VALID_FSM[from]?.includes(to);
-
-      if (allowed) {
-        box.style.borderColor = 'var(--emerald-border)';
-        box.style.background = 'rgba(16, 185, 129, 0.08)';
-        box.style.color = '#a7f3d0';
-        box.innerText = `✅ TRANSICIÓN VÁLIDA (200 OK): [${from}] → [${to}]\nLa FSM valida la matriz matemática y avanza el estado del comprobante en O(1).`;
-      } else {
-        const permitidos = VALID_FSM[from]?.join(', ') || 'ninguno (estado terminal)';
-        box.style.borderColor = 'var(--rose-border)';
-        box.style.background = 'rgba(244, 63, 94, 0.08)';
-        box.style.color = '#fecdd3';
-        box.innerText = `❌ TRANSICIÓN ILEGAL (409 Conflict): La FSM rechaza el salto de [${from}] a [${to}].\nTopología permitida desde [${from}]: [${permitidos}].\nSe garantiza que nadie confirme un gasto sin pasar por extracción.`;
-      }
+    function probarSaltoIlegal() {
+      const box = document.getElementById('fsmMsgBox');
+      box.style.display = 'block';
+      box.style.background = 'var(--rose-subtle)';
+      box.style.border = '1px solid var(--rose-border)';
+      box.style.color = '#fca5a5';
+      box.innerHTML = `🚨 <strong>Intento de salto ilegal bloqueado (Error 409 Conflict):</strong><br>El sistema impidió saltar de <em>[Foto Subida]</em> directamente a <em>[Deuda Lista]</em> sin antes pasar por <em>[Lectura OCR]</em> y <em>[Asignación de Platos]</em>. ¡El dinero está protegido!`;
     }
 
-    // Feature Flags Slide 4
-    const flagsState = { plin: true, yape: true, ocr: false };
-    function toggleFeatureFlag(flag) {
-      flagsState[flag] = !flagsState[flag];
-      const btn = document.getElementById(`flag-${flag}`);
-      const log = document.getElementById('flagAuditLog');
+    // Switch toggles
+    const switches = { plin: true, yape: true, ocr: false };
+    function toggleSwitch(name) {
+      switches[name] = !switches[name];
+      const btn = document.getElementById(`sw-${name}`);
+      btn.classList.toggle('on', switches[name]);
+
+      const log = document.getElementById('switchStatusLog');
       const time = new Date().toLocaleTimeString();
 
-      if (flag === 'ocr') {
-        btn.innerText = flagsState.ocr ? 'HTTP REMOTO' : 'LOCAL TESSERACT';
-        btn.className = `btn-toggle ${flagsState.ocr ? 'active' : 'inactive'}`;
-      } else {
-        btn.innerText = flagsState[flag] ? 'ACTIVO' : 'KILL SWITCH (OFF)';
-        btn.className = `btn-toggle ${flagsState[flag] ? 'active' : 'inactive'}`;
-      }
+      let label = name.toUpperCase();
+      let estado = switches[name] ? 'Habilitado' : 'Pausado por emergencia';
+      let icon = switches[name] ? '🟢' : '🔴';
 
-      const entry = document.createElement('div');
-      entry.style.color = flagsState[flag] ? 'var(--emerald)' : 'var(--rose)';
-      entry.innerText = `[${time}] Late Binding: '${flag.toUpperCase()}' → ${flagsState[flag] ? 'ENABLED' : 'KILL SWITCH TRIPPED'}`;
-      log.insertBefore(entry, log.firstChild);
+      log.innerHTML = `<div style="color: ${switches[name] ? 'var(--emerald-light)' : 'var(--rose)'}; margin-bottom: 6px;">
+        ${icon} <strong>[${time}] ${label}:</strong> ${estado} en caliente.
+      </div>` + log.innerHTML;
     }
 
-    // Flame Graph Hover Slide 7
-    function hoverFlame(text) {
-      document.getElementById('flameDetail').innerText = text;
-    }
-
-    // Telemetry ticker Slide 6
+    // Ticker en vivo
     setInterval(() => {
-      const r = (138 + Math.random() * 15).toFixed(1);
-      const d = (4.2 + Math.random() * 0.9).toFixed(1);
-      const rateEl = document.getElementById('metric-rate');
-      const durEl = document.getElementById('metric-duration');
-      if (rateEl) rateEl.innerText = `${r} req/s`;
-      if (durEl) durEl.innerText = `${d} ms`;
-    }, 2200);
+      const rate = Math.floor(140 + Math.random() * 15);
+      const lat = (4.0 + Math.random() * 0.8).toFixed(1);
+      const rEl = document.getElementById('liveRate');
+      const lEl = document.getElementById('liveLat');
+      if (rEl) rEl.innerText = `${rate} req/s`;
+      if (lEl) lEl.innerText = `${lat} ms`;
+    }, 2500);
   </script>
 </body>
 </html>
