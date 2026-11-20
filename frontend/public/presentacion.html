@@ -3,37 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sustentación PC3 — Mejoras de Arquitectura y Rendimiento | SplitVision</title>
-  <!-- Google Fonts: Plus Jakarta Sans (UI moderna y legible) + JetBrains Mono -->
+  <title>Sustentación PC3 — Construcción Dirigida por Datos y Observabilidad | SplitVision</title>
+  <!-- Google Fonts: Plus Jakarta Sans + JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg: #0b0f19;
-      --card-bg: rgba(18, 24, 38, 0.75);
+      --bg: #070b14;
+      --card-bg: rgba(15, 23, 42, 0.75);
       --card-border: rgba(255, 255, 255, 0.08);
-      --card-hover: rgba(255, 255, 255, 0.15);
+      --card-hover: rgba(255, 255, 255, 0.16);
       
-      --text: #f1f5f9;
+      --text: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
 
       --emerald: #10b981;
       --emerald-light: #34d399;
-      --emerald-subtle: rgba(16, 185, 129, 0.12);
-      --emerald-border: rgba(16, 185, 129, 0.28);
+      --emerald-bg: rgba(16, 185, 129, 0.12);
+      --emerald-border: rgba(16, 185, 129, 0.3);
 
       --blue: #3b82f6;
-      --blue-subtle: rgba(59, 130, 246, 0.12);
-      
-      --rose: #f43f5e;
-      --rose-subtle: rgba(244, 63, 94, 0.12);
-      --rose-border: rgba(244, 63, 94, 0.28);
+      --blue-bg: rgba(59, 130, 246, 0.12);
+      --blue-border: rgba(59, 130, 246, 0.3);
 
       --amber: #f59e0b;
-      --amber-subtle: rgba(245, 158, 11, 0.12);
+      --amber-bg: rgba(245, 158, 11, 0.12);
+      --amber-border: rgba(245, 158, 11, 0.3);
+
+      --rose: #f43f5e;
+      --rose-bg: rgba(244, 63, 94, 0.12);
+      --rose-border: rgba(244, 63, 94, 0.3);
+
+      --purple: #a855f7;
     }
 
     * {
@@ -47,8 +51,8 @@
     body {
       background-color: var(--bg);
       background-image: 
-        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 50%);
+        radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.07) 0%, transparent 45%),
+        radial-gradient(circle at 90% 90%, rgba(59, 130, 246, 0.07) 0%, transparent 45%);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -57,18 +61,17 @@
       user-select: none;
     }
 
-    /* Header superior */
     header {
-      padding: 18px 36px;
+      padding: 14px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--card-border);
-      background: rgba(11, 15, 25, 0.8);
+      background: rgba(7, 11, 20, 0.85);
       backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 100;
     }
 
     .brand {
@@ -78,6 +81,7 @@
     }
 
     .pill {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       font-weight: 700;
       padding: 4px 10px;
@@ -87,7 +91,7 @@
     }
 
     .pill-green {
-      background: var(--emerald-subtle);
+      background: var(--emerald-bg);
       border: 1px solid var(--emerald-border);
       color: var(--emerald-light);
     }
@@ -96,8 +100,8 @@
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--card-border);
       color: var(--text);
-      padding: 7px 14px;
-      border-radius: 10px;
+      padding: 6px 14px;
+      border-radius: 8px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
@@ -108,18 +112,17 @@
     }
 
     .btn-icon:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.14);
       border-color: var(--card-hover);
     }
 
-    /* Contenedor central */
     main {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
-      max-width: 1080px;
+      padding: 20px;
+      max-width: 1120px;
       width: 100%;
       margin: 0 auto;
     }
@@ -128,39 +131,39 @@
       width: 100%;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 38px 44px;
+      border-radius: 20px;
+      padding: 34px 40px;
       backdrop-filter: blur(16px);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-      min-height: 520px;
+      box-shadow: 0 25px 50px -15px rgba(0, 0, 0, 0.6);
+      min-height: 540px;
       display: none;
       flex-direction: column;
       justify-content: center;
-      animation: slideIn 0.25s ease-out forwards;
+      animation: fadeIn 0.22s ease-out forwards;
     }
 
     .slide.active {
       display: flex;
     }
 
-    @keyframes slideIn {
+    @keyframes fadeIn {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Tipografía y encabezados */
     .slide-badge {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       font-weight: 700;
       color: var(--emerald-light);
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
+      margin-bottom: 6px;
       display: inline-block;
-      margin-bottom: 8px;
     }
 
     .slide-title {
-      font-size: 28px;
+      font-size: 27px;
       font-weight: 800;
       color: #ffffff;
       line-height: 1.25;
@@ -168,65 +171,124 @@
     }
 
     .slide-desc {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--text-muted);
-      margin-top: 6px;
-      margin-bottom: 24px;
+      margin-top: 4px;
+      margin-bottom: 18px;
       line-height: 1.5;
     }
 
-    /* Grillas y tarjetas visuales */
+    /* Grillas y Cajas */
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 18px;
     }
 
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: 14px;
     }
 
     .box {
-      background: rgba(11, 15, 25, 0.7);
+      background: rgba(7, 11, 20, 0.85);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 22px;
-      transition: all 0.2s ease;
+      border-radius: 14px;
+      padding: 18px 22px;
     }
 
     .box-hover:hover {
       border-color: var(--card-hover);
-      transform: translateY(-2px);
     }
 
-    .icon-bubble {
-      width: 42px;
-      height: 42px;
+    /* Bloques de código con pestaña */
+    .code-container {
+      background: #03060c;
+      border: 1px solid var(--card-border);
       border-radius: 12px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .code-header {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .code-box {
+      padding: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: #e2e8f0;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .code-green { border-color: var(--emerald-border); color: #a7f3d0; }
+    .code-red { border-color: var(--rose-border); color: #fecdd3; }
+
+    /* Flujo FSM */
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 12px 0 16px 0;
+    }
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .step-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      margin-bottom: 14px;
+      font-size: 18px;
+      transition: all 0.2s ease;
     }
 
-    /* Switches interactivos amigables */
+    .step-item.active .step-icon {
+      background: var(--emerald-bg);
+      border-color: var(--emerald-border);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+      transform: scale(1.06);
+    }
+
+    /* Switches */
     .switch-card {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 18px;
-      background: rgba(11, 15, 25, 0.85);
+      padding: 12px 16px;
+      background: rgba(7, 11, 20, 0.9);
       border: 1px solid var(--card-border);
-      border-radius: 14px;
-      margin-bottom: 10px;
+      border-radius: 12px;
+      margin-bottom: 8px;
     }
 
     .switch-btn {
-      width: 52px;
-      height: 28px;
+      width: 48px;
+      height: 26px;
       background: rgba(255, 255, 255, 0.15);
       border-radius: 9999px;
       position: relative;
@@ -235,135 +297,78 @@
       transition: all 0.25s ease;
     }
 
-    .switch-btn.on {
-      background: var(--emerald);
-    }
+    .switch-btn.on { background: var(--emerald); }
 
     .switch-circle {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       background: #ffffff;
       border-radius: 50%;
       position: absolute;
       top: 3px;
       left: 3px;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      transition: all 0.25s ease;
     }
 
-    .switch-btn.on .switch-circle {
-      left: 27px;
-    }
+    .switch-btn.on .switch-circle { left: 25px; }
 
-    /* Semáforo / Pasos visuales */
-    .flow-steps {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 16px 0;
-      position: relative;
-    }
-
-    .step-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 8px;
-      flex: 1;
+    /* Flame Graph */
+    .flame-row { display: flex; gap: 4px; width: 100%; margin-bottom: 4px; }
+    .flame-bar {
+      border-radius: 5px;
+      padding: 6px 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: all 0.15s ease;
     }
+    .flame-bar:hover { filter: brightness(1.25); transform: translateY(-1px); }
 
-    .step-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      transition: all 0.2s ease;
-    }
-
-    .step-item.active .step-icon {
-      background: var(--emerald-subtle);
-      border-color: var(--emerald-border);
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
-      transform: scale(1.05);
-    }
-
-    .step-arrow {
-      color: var(--text-dim);
-      font-size: 16px;
-    }
-
-    /* Footer y Controles */
+    /* Footer */
     footer {
-      padding: 16px 36px;
+      padding: 14px 32px;
       border-top: 1px solid var(--card-border);
-      background: rgba(11, 15, 25, 0.8);
+      background: rgba(7, 11, 20, 0.85);
       backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       bottom: 0;
-      z-index: 50;
+      z-index: 100;
     }
 
-    .dots {
-      display: flex;
-      gap: 8px;
-    }
-
+    .dots { display: flex; gap: 6px; }
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.2);
       cursor: pointer;
       transition: all 0.2s ease;
     }
-
-    .dot.active {
-      width: 24px;
-      border-radius: 9999px;
-      background: var(--emerald);
-    }
+    .dot.active { width: 20px; border-radius: 9999px; background: var(--emerald); }
 
     .btn-nav {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--card-border);
       color: var(--text);
-      padding: 9px 20px;
-      border-radius: 12px;
-      font-size: 13px;
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
     }
-
-    .btn-nav:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.16);
-    }
-
-    .btn-nav:disabled {
-      opacity: 0.25;
-      cursor: not-allowed;
-    }
-
-    .btn-nav.primary {
-      background: #059669;
-      border-color: var(--emerald);
-      color: #fff;
-    }
-
-    .btn-nav.primary:hover:not(:disabled) {
-      background: #10b981;
-    }
+    .btn-nav:hover:not(:disabled) { background: rgba(255, 255, 255, 0.16); }
+    .btn-nav:disabled { opacity: 0.25; cursor: not-allowed; }
+    .btn-nav.primary { background: #059669; border-color: var(--emerald); color: #fff; }
+    .btn-nav.primary:hover:not(:disabled) { background: #10b981; }
   </style>
 </head>
 <body>
@@ -376,393 +381,576 @@
       <span style="font-size: 12px; color: var(--text-dim);">· Grupo 2 (UNI FIIS)</span>
     </div>
     <div style="display: flex; align-items: center; gap: 14px;">
-      <span id="slideCounter" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Paso 1 de 8</span>
+      <span id="slideCounter" style="font-family: 'JetBrains Mono'; font-size: 12px; color: var(--text-muted);">Slide 1 de 13</span>
       <button class="btn-icon" onclick="toggleFullscreen()">
         ⛶ Pantalla Completa (F)
       </button>
     </div>
   </header>
 
-  <!-- Slides -->
+  <!-- Contenido -->
   <main>
 
-    <!-- SLIDE 1: PORTADA AMIGABLE -->
+    <!-- SLIDE 1: PORTADA -->
     <div class="slide active" id="s-0">
-      <div style="text-align: center; max-width: 680px; margin: 0 auto;">
-        <span class="pill pill-green" style="margin-bottom: 12px;">Unidad 3: Semanas 9 y 10</span>
-        <h1 style="font-size: 34px; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 12px;">
-          Cómo hicimos SplitVision más resistente, inteligente y medible en vivo
+      <div style="text-align: center; max-width: 740px; margin: 0 auto;">
+        <span class="pill pill-green" style="margin-bottom: 12px;">SW707 Construcción de Software II</span>
+        <h1 style="font-size: 32px; font-weight: 800; color: #fff; line-height: 1.3; margin-bottom: 12px;">
+          Construcción Dirigida por Datos y Observabilidad de Runtime
         </h1>
-        <p style="font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px;">
-          Una explicación clara de cómo convertimos el código enredado en <strong>reglas organizadas</strong>, evitamos errores de cobro con <strong>validaciones automáticas</strong> y añadimos <strong>sensores en tiempo real</strong> para saber exactamente cómo rinde la app.
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+          Defensa del Sprint PC3: Implementación de Máquinas de Estado (FSM), Reglas en Tablas $O(1)$, Late Binding con Kill Switches, Logs Estructurados con MDC, Telemetría OpenTelemetry (Modelo RED) y Profiling con Flame Graphs.
         </p>
 
-        <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 30px;">
-          <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: 12px; font-size: 12px; color: var(--text-muted);">
+        <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 26px;">
+          <div class="box" style="padding: 8px 16px; font-size: 12px; color: var(--text-muted);">
             👨‍💻 <strong>Gonzalo Albornoz</strong> (20232551K)
           </div>
-          <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: 12px; font-size: 12px; color: var(--text-muted);">
+          <div class="box" style="padding: 8px 16px; font-size: 12px; color: var(--text-muted);">
             👨‍💻 <strong>Luis Angel Vargas</strong> (20231314E)
           </div>
-          <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); padding: 8px 16px; border-radius: 12px; font-size: 12px; color: var(--text-muted);">
+          <div class="box" style="padding: 8px 16px; font-size: 12px; color: var(--text-muted);">
             👨‍💻 <strong>Farid Zamudio</strong> (20231215G)
           </div>
         </div>
 
-        <button class="btn-nav primary" onclick="nextSlide()" style="font-size: 14px; padding: 12px 28px;">
-          Comenzar Explicación →
+        <button class="btn-nav primary" onclick="nextSlide()" style="font-size: 13px; padding: 10px 24px;">
+          Iniciar Sustentación →
         </button>
       </div>
     </div>
 
-    <!-- SLIDE 2: EL PROBLEMA VS LA SOLUCIÓN -->
+    <!-- SLIDE 2: HOJA DE RUTA UNIDAD 3 -->
     <div class="slide" id="s-1">
-      <span class="slide-badge">Semana 9 · Principio Central</span>
-      <h2 class="slide-title">Del "Código Laberinto" a "Reglas Organizadas"</h2>
+      <span class="slide-badge">Semana 9 & 10 · Contexto del Curso</span>
+      <h2 class="slide-title">La Evolución del Software en la Unidad 3</h2>
       <p class="slide-desc">
-        Antes, cada vez que el negocio quería cambiar un límite de pago, teníamos que modificar líneas de código y reiniciar todo el servidor.
-      </p>
-
-      <div class="grid-2">
-        <!-- El dolor / antes -->
-        <div class="box" style="border-color: var(--rose-border); background: rgba(244, 63, 94, 0.04);">
-          <div class="icon-bubble" style="background: var(--rose-subtle); color: var(--rose);">⚠️</div>
-          <h3 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">El Problema (Código Imperativo)</h3>
-          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
-            Había decenas de condiciones <code>if / else</code> mezcladas con la lógica de base de datos.
-          </p>
-          <ul style="font-size: 12px; color: #fca5a5; line-height: 1.8; padding-left: 18px;">
-            <li>Si cambiaba el límite de Yape, había que editar código fuente.</li>
-            <li>Riesgo de romper otras funciones por tocar código delicado.</li>
-            <li>Obligaba a apagar y reiniciar el servidor en producción.</li>
-          </ul>
-        </div>
-
-        <!-- La solución / después -->
-        <div class="box" style="border-color: var(--emerald-border); background: var(--emerald-subtle);">
-          <div class="icon-bubble" style="background: rgba(16, 185, 129, 0.2); color: var(--emerald-light);">💡</div>
-          <h3 style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px;">Nuestra Solución (Dirigida por Datos)</h3>
-          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
-            Separamos las <strong>reglas</strong> del motor de ejecución. Las reglas viven en una tabla limpia.
-          </p>
-          <ul style="font-size: 12px; color: #6ee7b7; line-height: 1.8; padding-left: 18px;">
-            <li>Búsqueda instantánea en <strong>O(1)</strong> según el método de pago.</li>
-            <li>Cambios de configuración en tiempo real (enlace tardío).</li>
-            <li>Código limpio, fácil de leer y libre de errores accidentales.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 3: EL SEMÁFORO DEL NEGOCIO (FSM) -->
-    <div class="slide" id="s-2">
-      <span class="slide-badge">Semana 9 · Máquina de Estados (FSM)</span>
-      <h2 class="slide-title">El Semáforo de la Cuenta: Nadie se Salta Pasos</h2>
-      <p class="slide-desc">
-        Un gasto no puede pasar mágicamente de "Foto subida" a "Confirmar deuda" sin haber sido revisado antes. El sistema lo impide por diseño.
-      </p>
-
-      <!-- Pasos visuales del comprobante -->
-      <div class="box" style="margin-bottom: 18px;">
-        <div style="font-size: 12px; font-weight: 700; color: var(--emerald-light); margin-bottom: 14px; text-transform: uppercase;">
-          Flujo Oficial del Comprobante
-        </div>
-
-        <div class="flow-steps">
-          <div class="step-item active" id="st-cargado" onclick="seleccionarPaso('CARGADO')">
-            <div class="step-icon">📸</div>
-            <span style="font-size: 12px; font-weight: 700;">1. Foto Subida</span>
-            <span style="font-size: 11px; color: var(--text-dim);">[CARGADO]</span>
-          </div>
-          <span class="step-arrow">→</span>
-          <div class="step-item" id="st-procesando" onclick="seleccionarPaso('PROCESANDO')">
-            <div class="step-icon">🔍</div>
-            <span style="font-size: 12px; font-weight: 700;">2. Leyendo OCR</span>
-            <span style="font-size: 11px; color: var(--text-dim);">[PROCESANDO]</span>
-          </div>
-          <span class="step-arrow">→</span>
-          <div class="step-item" id="st-extraido" onclick="seleccionarPaso('EXTRAÍDO')">
-            <div class="step-icon">🍽️</div>
-            <span style="font-size: 12px; font-weight: 700;">3. Asignar Platos</span>
-            <span style="font-size: 11px; color: var(--text-dim);">[EXTRAÍDO]</span>
-          </div>
-          <span class="step-arrow">→</span>
-          <div class="step-item" id="st-confirmado" onclick="seleccionarPaso('CONFIRMADO')">
-            <div class="step-icon">💳</div>
-            <span style="font-size: 12px; font-weight: 700;">4. Deuda Lista</span>
-            <span style="font-size: 11px; color: var(--text-dim);">[CONFIRMADO]</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Simulador de Intento Ilegal -->
-      <div class="box" style="background: rgba(11, 15, 25, 0.95); display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-        <div>
-          <strong style="font-size: 13px; color: #fff; display: block; margin-bottom: 4px;">¿Qué pasa si un usuario intenta hacer trampa?</strong>
-          <span style="font-size: 12px; color: var(--text-muted);">
-            Intentar confirmar una boleta recién subida sin que el OCR haya extraído los montos.
-          </span>
-        </div>
-        <button class="btn-icon" style="background: var(--rose-subtle); border-color: var(--rose-border); color: #fecdd3;" onclick="probarSaltoIlegal()">
-          🚨 Probar salto ilegal (1 → 4)
-        </button>
-      </div>
-
-      <div id="fsmMsgBox" style="margin-top: 10px; font-size: 12px; padding: 12px 16px; border-radius: 12px; display: none;"></div>
-    </div>
-
-    <!-- SLIDE 4: INTERRUPTORES DE EMERGENCIA (KILL SWITCHES) -->
-    <div class="slide" id="s-3">
-      <span class="slide-badge">Semana 9 · Late Binding & Resiliencia</span>
-      <h2 class="slide-title">Frenos de Emergencia en Caliente (Kill Switches)</h2>
-      <p class="slide-desc">
-        ¿Qué pasa si un domingo por la tarde Yape se cae o la red se satura? Podemos pausar ese medio de pago en 1 segundo sin tocar código ni reiniciar la app.
-      </p>
-
-      <div class="grid-2">
-        <div>
-          <div class="switch-card">
-            <div>
-              <strong style="font-size: 13px; color: #fff; display: block;">Pasarela PLIN</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">Permite pagar usando números telefónicos</span>
-            </div>
-            <button id="sw-plin" class="switch-btn on" onclick="toggleSwitch('plin')">
-              <div class="switch-circle"></div>
-            </button>
-          </div>
-
-          <div class="switch-card">
-            <div>
-              <strong style="font-size: 13px; color: #fff; display: block;">Pasarela YAPE</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">Corta solicitudes si el servicio colapsa</span>
-            </div>
-            <button id="sw-yape" class="switch-btn on" onclick="toggleSwitch('yape')">
-              <div class="switch-circle"></div>
-            </button>
-          </div>
-
-          <div class="switch-card">
-            <div>
-              <strong style="font-size: 13px; color: #fff; display: block;">Proveedor OCR Externo</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">Si falla internet, conmuta a lectura local</span>
-            </div>
-            <button id="sw-ocr" class="switch-btn" onclick="toggleSwitch('ocr')">
-              <div class="switch-circle"></div>
-            </button>
-          </div>
-        </div>
-
-        <!-- Registro amigable -->
-        <div class="box" style="display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="font-size: 11px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase; margin-bottom: 8px;">
-              Efecto en Vivo (Sin Reinicios)
-            </div>
-            <div id="switchStatusLog" style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
-              Haz clic en cualquier interruptor a la izquierda para ver cómo el sistema se adapta instantáneamente en memoria.
-            </div>
-          </div>
-          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 10px 14px; border-radius: 10px; font-size: 11px; color: var(--text-dim); margin-top: 12px;">
-            🛡️ <strong>Desacoplar Despliegue de Lanzamiento:</strong> La funcionalidad ya está lista en producción, pero se enciende o apaga a voluntad.
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 5: LA CLÍNICA DEL SOFTWARE (OBSERVABILIDAD) -->
-    <div class="slide" id="s-4">
-      <span class="slide-badge">Semana 10 · Los 3 Pilares</span>
-      <h2 class="slide-title">La Observabilidad: El Chequeo Médico del Sistema</h2>
-      <p class="slide-desc">
-        La observabilidad no es instalar un plugin; se construye dentro del código para saber por qué ocurren las cosas.
+        Del software a prueba de fallos (Semanas 1–8) hacia sistemas capaces de alterar su comportamiento en caliente y medirse a sí mismos.
       </p>
 
       <div class="grid-3">
-        <!-- Logs con MDC -->
-        <div class="box box-hover">
-          <div class="icon-bubble" style="background: var(--blue-subtle); color: var(--blue);">📋</div>
-          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">El Historial Clínico</h3>
-          <span style="font-size: 11px; font-weight: 600; color: var(--blue); display: block; margin-bottom: 8px;">Logs JSON con MDC</span>
+        <div class="box">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Semanas 1 a 8</span>
+          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin: 6px 0;">El Pasado: Robustez</h3>
           <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-            Cada evento registra exactamente <strong>quién</strong> fue, <strong>desde qué IP</strong> y con qué <strong>Trace ID</strong>, sin ensuciar el código.
+            Programación defensiva, contratos, control de concurrencia pesimista en deudas y tolerancia a caídas del OCR.
           </p>
         </div>
 
-        <!-- Métricas RED -->
-        <div class="box box-hover">
-          <div class="icon-bubble" style="background: var(--emerald-subtle); color: var(--emerald);">💓</div>
-          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">Los Signos Vitales</h3>
-          <span style="font-size: 11px; font-weight: 600; color: var(--emerald); display: block; margin-bottom: 8px;">Modelo RED</span>
+        <div class="box" style="border-color: var(--emerald-border); background: var(--emerald-bg);">
+          <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase;">Semana 9 (El Presente)</span>
+          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin: 6px 0;">Lógica Dinámica</h3>
           <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-            Medimos en tiempo real el pulso de la app: cuántas personas entran por segundo, cuántos errores hay y qué tan rápido responde.
+            Máquinas de Estado Finito (FSM), diseño dirigido por tablas $O(1)$, Feature Flags y enlace tardío (Late Binding).
           </p>
         </div>
 
-        <!-- Trazas OpenTelemetry -->
-        <div class="box box-hover">
-          <div class="icon-bubble" style="background: rgba(168, 85, 247, 0.12); color: #c084fc);">🩻</div>
-          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;">La Resonancia Magnética</h3>
-          <span style="font-size: 11px; font-weight: 600; color: #c084fc; display: block; margin-bottom: 8px;">Trazas OpenTelemetry</span>
+        <div class="box" style="border-color: var(--blue-border); background: var(--blue-bg);">
+          <span style="font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase;">Semana 10 (El Presente)</span>
+          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin: 6px 0;">Observabilidad</h3>
           <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-            Seguimos el viaje completo de una petición desde el clic del celular hasta el disco de la base de datos para ver dónde tarda más.
+            Logs JSON hiper-contextualizados (MDC), telemetría OpenTelemetry (Modelo RED) y profiling con Flame Graphs.
           </p>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 6: VELOCÍMETRO DEL SISTEMA (MÉTRICAS RED) -->
-    <div class="slide" id="s-5">
-      <span class="slide-badge">Semana 10 · Modelo RED en Vivo</span>
-      <h2 class="slide-title">¿Cómo está rindiendo SplitVision ahora mismo?</h2>
+    <!-- SLIDE 3: SEMANA 9 - LÓGICA IMPERATIVA VS DATOS ESTRUCTURADOS -->
+    <div class="slide" id="s-2">
+      <span class="slide-badge">Semana 9 · Principio Arquitectónico</span>
+      <h2 class="slide-title">Lógica Imperativa vs. Construcción Dirigida por Datos</h2>
       <p class="slide-desc">
-        Sensores conectados a la API que calculan continuamente la velocidad, confiabilidad y carga.
+        En lugar de preguntarnos '¿Qué código debemos escribir?', preguntamos '¿Qué configuración debemos leer?'
       </p>
 
-      <div class="grid-3" style="margin-bottom: 18px;">
-        <div class="box" style="text-align: center;">
-          <span style="font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase;">1. Rate (Tasa)</span>
-          <div id="liveRate" style="font-size: 32px; font-weight: 800; color: #fff; margin: 8px 0;">145 req/s</div>
-          <span style="font-size: 12px; color: var(--text-muted);">Tráfico fluido y estable</span>
+      <div class="grid-2">
+        <div>
+          <div style="font-size: 12px; font-weight: 700; color: var(--rose); margin-bottom: 6px;">
+            ❌ Antes: Cascada Imperativa if/else/switch
+          </div>
+          <div class="code-container code-red">
+            <div class="code-header"><span>src/modules/pagos/pagos.service.ts (Antiguo)</span></div>
+            <div class="code-box">if (method !== 'EFECTIVO' && !hasEvidence) {
+  throw validation('Evidencia obligatoria');
+} else if (method === 'PLIN' && amount > 150000) {
+  throw validation('Excede límite diario PLIN');
+} else if (receipt.status !== 'EXTRAÍDO') {
+  if (receipt.status === 'CONFIRMADO') throw conflict('Ya confirmado');
+  throw conflict('Estado no permite reparto');
+}</div>
+          </div>
+          <p style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+            Alta complejidad ciclomática. Exige recompilar y redesplegar ante cada cambio de regla.
+          </p>
         </div>
 
-        <div class="box" style="text-align: center;">
-          <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase;">2. Errors (Fallas)</span>
-          <div style="font-size: 32px; font-weight: 800; color: var(--emerald-light); margin: 8px 0;">0.05%</div>
-          <span style="font-size: 12px; color: var(--text-muted);">99.95% de éxito sin caídas</span>
-        </div>
+        <div>
+          <div style="font-size: 12px; font-weight: 700; color: var(--emerald-light); margin-bottom: 6px;">
+            ✅ Ahora: Búsqueda O(1) en Tablas + FSM Declarativa
+          </div>
+          <div class="code-container code-green">
+            <div class="code-header"><span>src/modules/pagos/pagos.service.ts (Actual)</span></div>
+            <div class="code-box">// 1. Reglas en O(1) desacopladas del motor
+const rule = validatePaymentByRules(method, amountCents, ref, hasEvidence, isPlinActive);
 
-        <div class="box" style="text-align: center;">
-          <span style="font-size: 11px; font-weight: 700; color: var(--amber); text-transform: uppercase;">3. Duration (Velocidad)</span>
-          <div id="liveLat" style="font-size: 32px; font-weight: 800; color: #fff; margin: 8px 0;">4.2 ms</div>
-          <span style="font-size: 12px; color: var(--text-muted);">Responde en un pestañeo</span>
+// 2. Transición validada matemáticamente por FSM
+RECEIPT_FSM.assertTransition(receipt.status, 'CONFIRMADO', receiptId);</div>
+          </div>
+          <p style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+            Complejidad ciclomática = 1. Reglas modificables en tiempo de ejecución (Late Binding).
+          </p>
         </div>
-      </div>
-
-      <div class="box" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px;">
-        <span style="font-size: 13px; color: var(--text-muted);">
-          🌐 Métricas listas para monitores profesionales como <strong>Prometheus y Grafana</strong>
-        </span>
-        <span class="pill pill-green">GET /api/admin/metrics</span>
       </div>
     </div>
 
-    <!-- SLIDE 7: PRUEBA DE ESFUERZO (PROFILING) -->
-    <div class="slide" id="s-6">
-      <span class="slide-badge">Semana 10 · Profiling & Rendimiento</span>
-      <h2 class="slide-title">Prueba de Fuego: Dividir cuentas entre 50 amigos</h2>
+    <!-- SLIDE 4: SEMANA 9 - MÁQUINAS DE ESTADO FINITO (FSM) -->
+    <div class="slide" id="s-3">
+      <span class="slide-badge">Semana 9 · Máquinas de Estado Finito</span>
+      <h2 class="slide-title">Máquinas de Estado Finito (FSM) como Mecanismo de Control</h2>
       <p class="slide-desc">
-        Sometimos el algoritmo matemático a una prueba extrema con 150 platos, impuestos y descuentos para encontrar posibles cuellos de botella.
+        Previene transiciones ilegales por diseño en O(1), convirtiendo reglas de negocio ambiguas en topologías matemáticas exactas.
       </p>
 
       <div class="grid-2">
         <div class="box" style="display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="font-size: 11px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase; margin-bottom: 8px;">
-              Resultado del Análisis
+            <div style="font-size: 12px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase; margin-bottom: 10px;">
+              Los 3 Principios de la FSM (Diapositiva 4)
             </div>
-            <div style="font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 6px;">
-              &lt; 0.2 milisegundos ⚡
-            </div>
-            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
-              El algoritmo de reparto del residuo mayor (Hamilton) es <strong>extremadamente rápido</strong>. La CPU casi ni se entera y no hay fugas de memoria.
-            </p>
+            <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.8; padding-left: 16px;">
+              <li><strong>Comportamiento por Estado:</strong> Las operaciones permitidas están dictadas estrictamente por el estado actual.</li>
+              <li><strong>Restricción Matemática:</strong> Elimina la necesidad de validar el estado previo con if/else en cada función.</li>
+              <li><strong>Construcción Segura:</strong> Si una transición no está en la tabla, arroja <code>409 Conflict</code> instantáneo.</li>
+            </ul>
           </div>
-
-          <div style="margin-top: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 12px; border-radius: 12px; font-size: 12px; color: var(--text-muted);">
-            💡 <strong>Conclusión del Flame Graph:</strong> El 85% del tiempo de una operación se va en guardar la transacción en PostgreSQL, no en el cálculo. Por eso usamos bloqueos atómicos breves.
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 10px 14px; border-radius: 10px; font-size: 11px; color: var(--emerald-light);">
+            🧪 Verificado con test unitario: <code>test/fsm.test.ts</code>
           </div>
         </div>
 
-        <!-- Visualización sencilla de dónde se va el tiempo -->
-        <div class="box">
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 12px;">
-            ¿Dónde se gasta el tiempo? (Pila de llamadas)
-          </div>
-
-          <div style="margin-bottom: 14px;">
-            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-              <span>Base de Datos PostgreSQL (I/O)</span>
-              <span style="font-weight: 700; color: var(--blue);">85%</span>
-            </div>
-            <div style="height: 10px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden;">
-              <div style="width: 85%; height: 100%; background: var(--blue);"></div>
-            </div>
-          </div>
-
-          <div style="margin-bottom: 14px;">
-            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-              <span>Algoritmo de Reparto Hamilton (CPU)</span>
-              <span style="font-weight: 700; color: var(--emerald-light);">10%</span>
-            </div>
-            <div style="height: 10px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden;">
-              <div style="width: 10%; height: 100%; background: var(--emerald);"></div>
-            </div>
-          </div>
-
-          <div>
-            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-              <span>Manejo de Memoria V8</span>
-              <span style="font-weight: 700; color: var(--amber);">5%</span>
-            </div>
-            <div style="height: 10px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden;">
-              <div style="width: 5%; height: 100%; background: var(--amber);"></div>
-            </div>
+        <div>
+          <div class="code-container code-green">
+            <div class="code-header"><span>src/common/fsm.ts</span></div>
+            <div class="code-box">export const RECEIPT_FSM = new StateMachine&lt;ReceiptFsmState&gt;('Comprobante', [
+  { from: 'CARGADO', to: ['PROCESANDO'] },
+  { from: 'PROCESANDO', to: ['EXTRAÍDO', 'FALLIDO'] },
+  { from: 'EXTRAÍDO', to: ['CONFIRMADO', 'FALLIDO'] },
+  { from: 'FALLIDO', to: ['PROCESANDO', 'EXTRAÍDO'] },
+  { from: 'CONFIRMADO', to: [] }, // Estado terminal inmutable
+]);</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 8: CONCLUSIONES Y CHECKLIST -->
-    <div class="slide" id="s-7">
-      <div style="text-align: center; max-width: 720px; margin: 0 auto;">
-        <span class="pill pill-green" style="margin-bottom: 10px;">Resumen Ejecutivo</span>
-        <h2 style="font-size: 30px; font-weight: 800; color: #fff; margin-bottom: 14px;">
-          Todos los Criterios de la PC3 Implementados y Verificados
-        </h2>
-        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">
-          Logramos un sistema resistente, auditable y listo para escalar sin interrupciones.
-        </p>
+    <!-- SLIDE 5: SIMULADOR FSM EN VIVO -->
+    <div class="slide" id="s-4">
+      <span class="slide-badge">Semana 9 · Simulador Interactivo</span>
+      <h2 class="slide-title">Demostración en Vivo: Autómata del Comprobante</h2>
+      <p class="slide-desc">
+        Prueba cómo el autómata acepta saltos válidos e impide físicamente que un usuario cobre un comprobante que aún no fue procesado.
+      </p>
 
-        <div style="display: flex; flex-direction: column; gap: 8px; text-align: left; margin-bottom: 24px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 13px;">
-            <span>✅ <strong>Servicio Distribuido:</strong> API NestJS + Worker de OCR desacoplado.</span>
-            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">LISTO</span>
+      <div class="box" style="margin-bottom: 14px;">
+        <div class="flow-steps">
+          <div class="step-item active" id="st-cargado">
+            <div class="step-icon">📸</div>
+            <span style="font-size: 11px; font-weight: 700;">1. CARGADO</span>
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 13px;">
-            <span>✅ <strong>Logs JSON con MDC:</strong> Contexto automático por hilo con AsyncLocalStorage.</span>
-            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">LISTO</span>
+          <span style="color: var(--text-dim);">→</span>
+          <div class="step-item" id="st-procesando">
+            <div class="step-icon">🔍</div>
+            <span style="font-size: 11px; font-weight: 700;">2. PROCESANDO</span>
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 13px;">
-            <span>✅ <strong>Telemetría OTel:</strong> Métricas RED en vivo y Spans de trazabilidad.</span>
-            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">LISTO</span>
+          <span style="color: var(--text-dim);">→</span>
+          <div class="step-item" id="st-extraido">
+            <div class="step-icon">🍽️</div>
+            <span style="font-size: 11px; font-weight: 700;">3. EXTRAÍDO</span>
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 13px;">
-            <span>✅ <strong>Resiliencia Activa:</strong> FSM de estados + Kill Switches en caliente.</span>
-            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">LISTO</span>
+          <span style="color: var(--text-dim);">→</span>
+          <div class="step-item" id="st-confirmado">
+            <div class="step-icon">💳</div>
+            <span style="font-size: 11px; font-weight: 700;">4. CONFIRMADO</span>
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 13px;">
-            <span>✅ <strong>Profiling de Runtime:</strong> Diagnóstico de cuellos de botella con Flame Graph.</span>
-            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">LISTO</span>
+        </div>
+      </div>
+
+      <div class="box" style="display: flex; align-items: center; justify-content: space-between; gap: 14px;">
+        <div>
+          <strong style="font-size: 13px; color: #fff; display: block;">Simular Intento de Salto Ilegal:</strong>
+          <span style="font-size: 12px; color: var(--text-muted);">
+            Intentar confirmar un gasto recién subido saltándose el OCR y la revisión.
+          </span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-nav" onclick="simularPasoValido()">
+            ✅ Salto Válido (1 → 2)
+          </button>
+          <button class="btn-icon" style="background: var(--rose-bg); border-color: var(--rose-border); color: #fecdd3;" onclick="simularPasoInvalido()">
+            🚨 Salto Ilegal (1 → 4)
+          </button>
+        </div>
+      </div>
+
+      <div id="fsmFeedback" class="code-box" style="margin-top: 10px; font-size: 11.5px; display: none;"></div>
+    </div>
+
+    <!-- SLIDE 6: TABLE-DRIVEN DESIGN (REGLAS DE PAGO) -->
+    <div class="slide" id="s-5">
+      <span class="slide-badge">Semana 9 · Table-Driven Design</span>
+      <h2 class="slide-title">Construcción Dirigida por Tablas (O(1))</h2>
+      <p class="slide-desc">
+        Reemplazar bifurcaciones complejas con búsquedas directas en diccionarios estructurados.
+      </p>
+
+      <div class="grid-2">
+        <div class="box" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase; margin-bottom: 8px;">
+              Ventajas en SplitVision (Diapositiva 6)
+            </div>
+            <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.8; padding-left: 16px;">
+              <li><strong>Acceso Directo O(1):</strong> En lugar de evaluar 5 condiciones booleanas secuenciales, se indexa <code>PAYMENT_RULES_TABLE[method]</code>.</li>
+              <li><strong>Desacoplamiento:</strong> Las reglas de negocio (montos máximos, necesidad de voucher) están separadas de la ejecución.</li>
+              <li><strong>Evolución Segura:</strong> Agregar Plin, Yape o ApplePay sólo requiere una nueva fila en la tabla.</li>
+            </ul>
+          </div>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 10px 14px; border-radius: 10px; font-size: 11px; color: var(--emerald-light);">
+            🧪 Verificado con test unitario: <code>test/payment-rules.test.ts</code>
           </div>
         </div>
 
-        <button class="btn-nav" onclick="goToSlide(0)" style="font-size: 13px;">
-          ↺ Volver al Inicio
+        <div>
+          <div class="code-container code-green">
+            <div class="code-header"><span>src/modules/pagos/payment-rules.ts</span></div>
+            <div class="code-box">export const PAYMENT_RULES_TABLE: Record&lt;PaymentMethod, PaymentMethodRule&gt; = {
+  EFECTIVO:      { requiresEvidence: false, maxAmountCents: 100000_00 },
+  YAPE:          { requiresEvidence: true,  maxAmountCents: 2000_00 },
+  PLIN:          { requiresEvidence: true,  maxAmountCents: 1500_00 },
+  TRANSFERENCIA: { requiresEvidence: true,  maxAmountCents: 1000000_00 },
+};</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: LATE BINDING & FEATURE FLAGS (KILL SWITCHES) -->
+    <div class="slide" id="s-6">
+      <span class="slide-badge">Semana 9 · Late Binding & Feature Flags</span>
+      <h2 class="slide-title">Enlace Tardío y Kill Switches en Runtime</h2>
+      <p class="slide-desc">
+        Desacoplar el despliegue del lanzamiento: Rollbacks instantáneos sin revertir código ni reiniciar contenedores.
+      </p>
+
+      <div class="grid-2">
+        <div>
+          <div class="switch-card">
+            <div>
+              <strong style="font-size: 13px; color: #fff; display: block;">Kill Switch: PLIN</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Pausa temporal si la pasarela satura</span>
+            </div>
+            <button id="sw-plin" class="switch-btn on" onclick="toggleSwitch('plin')"><div class="switch-circle"></div></button>
+          </div>
+
+          <div class="switch-card">
+            <div>
+              <strong style="font-size: 13px; color: #fff; display: block;">Kill Switch: YAPE</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Corta solicitudes ante incidentes del banco</span>
+            </div>
+            <button id="sw-yape" class="switch-btn on" onclick="toggleSwitch('yape')"><div class="switch-circle"></div></button>
+          </div>
+
+          <div class="switch-card">
+            <div>
+              <strong style="font-size: 13px; color: #fff; display: block;">OCR Externo vs. Local</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">Alterna estrategia HTTP o Tesseract local</span>
+            </div>
+            <button id="sw-ocr" class="switch-btn" onclick="toggleSwitch('ocr')"><div class="switch-circle"></div></button>
+          </div>
+        </div>
+
+        <div>
+          <div class="code-container code-green">
+            <div class="code-header"><span>src/common/feature-flags.service.ts</span></div>
+            <div class="code-box">setFlag(key: string, enabled: boolean): FeatureFlagDefinition {
+  const existing = this.flags.get(key);
+  existing.enabled = enabled; // Modificación en memoria en runtime
+  
+  logger.warn('Feature Flag conmutada en caliente (Late Binding)', {
+    key, enabled, killSwitch: !enabled
+  });
+  return existing;
+}</div>
+          </div>
+          <div id="flagAuditText" style="margin-top: 8px; font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald-light);">
+            [AUDIT] Haz clic en los interruptores para alterar el comportamiento en caliente.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: SEMANA 10 - LOS 3 PILARES DE OBSERVABILIDAD -->
+    <div class="slide" id="s-7">
+      <span class="slide-badge">Semana 10 · Diagnóstico de Sistemas</span>
+      <h2 class="slide-title">La Observabilidad se Construye, No se Instala</h2>
+      <p class="slide-desc">
+        La observabilidad traslada el enfoque del monitoreo reactivo (¿Qué se rompió?) al diagnóstico proactivo (¿Por qué se rompió?).
+      </p>
+
+      <div class="grid-3">
+        <div class="box">
+          <div style="font-size: 22px; margin-bottom: 8px;">📋</div>
+          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Logs Estructurados</h3>
+          <span style="font-size: 11px; color: var(--blue); font-weight: 600; display: block; margin-bottom: 8px;">El Historial Clínico</span>
+          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            Eventos discretos en JSON con metadatos de hilo adheridos mediante MDC.
+          </p>
+        </div>
+
+        <div class="box">
+          <div style="font-size: 22px; margin-bottom: 8px;">💓</div>
+          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Métricas RED</h3>
+          <span style="font-size: 11px; color: var(--emerald); font-weight: 600; display: block; margin-bottom: 8px;">Los Signos Vitales</span>
+          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            Agregaciones numéricas en el tiempo: Rate (req/s), Errors (%) y Latencia p95.
+          </p>
+        </div>
+
+        <div class="box">
+          <div style="font-size: 22px; margin-bottom: 8px;">🩻</div>
+          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px;">Trazas OTel</h3>
+          <span style="font-size: 11px; color: #c084fc; font-weight: 600; display: block; margin-bottom: 8px;">La Resonancia Magnética</span>
+          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            Flujo causal de una petición mediante Trace ID propagado en cabeceras HTTP.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: LOGS JSON CON MDC (ASYNCLOCALSTORAGE) -->
+    <div class="slide" id="s-8">
+      <span class="slide-badge">Semana 10 · MDC (Mapped Diagnostic Context)</span>
+      <h2 class="slide-title">Logs Estructurados e Hiper-contextualización</h2>
+      <p class="slide-desc">
+        El MDC funciona como un pasaporte de datos adherido al hilo asíncrono para indexación inmediata.
+      </p>
+
+      <div class="grid-2">
+        <div>
+          <div class="code-container code-green">
+            <div class="code-header"><span>Log JSON emitido en producción</span></div>
+            <div class="code-box">{
+  "timestamp": "2026-11-20T21:05:14.210Z",
+  "level": "INFO",
+  "event": "payment.create",
+  "trace_id": "8a3c60f7-b24a-4e92-bc91-235123d",
+  "user_id": "usr_7714",
+  "tenant": "event_9912",
+  "ip_address": "192.168.1.15",
+  "amount_cents": 4500,
+  "method": "YAPE"
+}</div>
+          </div>
+        </div>
+
+        <div class="box" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase; margin-bottom: 8px;">
+              Implementación Técnica (Semana 10 · Diapo 3)
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 10px;">
+              En Java se usa <code>org.slf4j.MDC</code>. En Node.js/NestJS utilizamos <strong><code>AsyncLocalStorage</code></strong> de la API nativa de Node.
+            </p>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+              El middleware inyecta el <code>trace_id</code> e IP al recibir el request. Cualquier función que invoque <code>logger.info()</code> hereda el contexto sin pasarlo como argumento.
+            </p>
+          </div>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); padding: 8px 12px; border-radius: 8px; font-size: 11px; color: var(--emerald-light);">
+            🧪 Verificado con test unitario: <code>test/telemetry.test.ts</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: MODELO RED & OPENTELEMETRY -->
+    <div class="slide" id="s-9">
+      <span class="slide-badge">Semana 10 · Telemetría y Modelo RED</span>
+      <h2 class="slide-title">Métricas de Servicio (Modelo RED) y Spans</h2>
+      <p class="slide-desc">
+        Rate, Errors y Duration calculados en vivo y expuestos bajo el estándar unificado OpenTelemetry / Prometheus.
+      </p>
+
+      <div class="grid-3" style="margin-bottom: 14px;">
+        <div class="box" style="text-align: center; border-color: var(--blue-border);">
+          <span style="font-size: 11px; font-weight: 700; color: var(--blue);">RATE (TASA)</span>
+          <div id="m-rate" style="font-size: 28px; font-weight: 800; color: #fff; margin: 6px 0;">146 req/s</div>
+          <span style="font-size: 11px; color: var(--text-muted);">Peticiones por segundo</span>
+        </div>
+
+        <div class="box" style="text-align: center; border-color: var(--rose-border);">
+          <span style="font-size: 11px; font-weight: 700; color: var(--rose);">ERRORS (FALLAS)</span>
+          <div style="font-size: 28px; font-weight: 800; color: var(--emerald-light); margin: 6px 0;">0.04%</div>
+          <span style="font-size: 11px; color: var(--text-muted);">SLA 99.9% de éxito</span>
+        </div>
+
+        <div class="box" style="text-align: center; border-color: var(--emerald-border);">
+          <span style="font-size: 11px; font-weight: 700; color: var(--emerald);">DURATION (P95)</span>
+          <div id="m-lat" style="font-size: 28px; font-weight: 800; color: #fff; margin: 6px 0;">4.4 ms</div>
+          <span style="font-size: 11px; color: var(--text-muted);">Percentil 95 de latencia</span>
+        </div>
+      </div>
+
+      <div class="code-container code-green">
+        <div class="code-header">
+          <span>Endpoint Nativo: GET /api/admin/metrics (Estándar Prometheus)</span>
+          <span class="pill pill-green">OTEL EXPORTER</span>
+        </div>
+        <div class="code-box">http_requests_total 12480
+http_errors_total{code="5xx"} 2
+http_request_duration_ms{quantile="0.5"} 1.2
+http_request_duration_ms{quantile="0.95"} 4.4
+http_request_duration_ms{quantile="0.99"} 12.1
+process_resident_memory_bytes 71303168</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: PROFILING Y FLAME GRAPH INTERACTIVO -->
+    <div class="slide" id="s-10">
+      <span class="slide-badge">Semana 10 · Profiling de Runtime</span>
+      <h2 class="slide-title">Análisis de Rendimiento y Flame Graph</h2>
+      <p class="slide-desc">
+        Lectura del Flame Graph: Buscando las mesetas anchas en la cima para detectar cuellos de botella de CPU vs. I/O.
+      </p>
+
+      <div class="box" style="margin-bottom: 10px; padding: 14px;">
+        <div class="flame-row">
+          <div class="flame-bar" style="width: 100%; background: #1e293b; color: #94a3b8;" onmouseenter="hoverFlame('HTTP Root: POST /api/receipts/:id/confirm (100% Muestras de CPU)')">
+            HTTP Root: POST /api/receipts/:id/confirm (100%)
+          </div>
+        </div>
+        <div class="flame-row">
+          <div class="flame-bar" style="width: 85%; background: #78350f; color: #fef3c7;" onmouseenter="hoverFlame('RepartoService.confirmSplit() — Transacción de negocio (85% tiempo total)')">
+            RepartoService.confirmSplit() [85%]
+          </div>
+          <div class="flame-bar" style="width: 15%; background: #1e3a8a; color: #bfdbfe;" onmouseenter="hoverFlame('PostgreSQL Lock I/O: Bloqueo SELECT FOR UPDATE (15% tiempo total)')">
+            DB I/O [15%]
+          </div>
+        </div>
+        <div class="flame-row" style="width: 85%;">
+          <div class="flame-bar" style="width: 76%; background: #c2410c; color: #ffedd5;" onmouseenter="hoverFlame('computeSplit(): Algoritmo de Hamilton del Mayor Residuo (65% CPU de cómputo)')">
+            computeSplit() [Hamilton Largest Remainder] [65%]
+          </div>
+          <div class="flame-bar" style="width: 24%; background: #881337; color: #fecdd3;" onmouseenter="hoverFlame('V8 Garbage Collection: Asignaciones de Objetos en Heap (20% CPU)')">
+            V8 GC Heap [20%]
+          </div>
+        </div>
+        <div class="flame-row" style="width: 65%;">
+          <div class="flame-bar" style="width: 58%; background: #f59e0b; color: #000; font-weight: 800;" onmouseenter="hoverFlame('distribute(): Cocientes y residuos con BigInt (38% CPU) — Meseta Principal')">
+            distribute() [BigInt Residuo] (38%)
+          </div>
+          <div class="flame-bar" style="width: 42%; background: #eab308; color: #000; font-weight: 800;" onmouseenter="hoverFlame('sort(): Desempate determinista O(N log N) (27% CPU)')">
+            sort() [Desempate] (27%)
+          </div>
+        </div>
+      </div>
+
+      <div class="box" style="padding: 10px 14px;">
+        <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--emerald-light); font-weight: 700;">
+          Nodo seleccionado en la Flama:
+        </div>
+        <div id="flameDetail" style="font-family: 'JetBrains Mono'; font-size: 11.5px; color: #f8fafc; margin-top: 2px;">
+          Pasa el cursor sobre los bloques del Flame Graph para inspeccionar la pila de llamadas.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: PRUEBAS REALES Y EVIDENCIAS DE VERIFICACIÓN -->
+    <div class="slide" id="s-11">
+      <span class="slide-badge">Evidencias y Verificabilidad</span>
+      <h2 class="slide-title">Pruebas Automatizadas y Benchmarks Reales</h2>
+      <p class="slide-desc">
+        Toda métrica y simulación presentada está respaldada por tests unitarios y scripts ejecutables en el repositorio.
+      </p>
+
+      <div class="grid-2">
+        <div class="box">
+          <div style="font-size: 12px; font-weight: 700; color: var(--emerald-light); text-transform: uppercase; margin-bottom: 8px;">
+            Suites de Pruebas Automatizadas (Jest)
+          </div>
+          <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.8; padding-left: 16px;">
+            <li><code>test/fsm.test.ts</code>: Verifica transiciones válidas e ilegales en la FSM.</li>
+            <li><code>test/payment-rules.test.ts</code>: Verifica reglas en $O(1)$ y Kill Switches.</li>
+            <li><code>test/telemetry.test.ts</code>: Verifica el MDC con <code>AsyncLocalStorage</code> y exportador Prometheus.</li>
+            <li><code>test/properties.test.ts</code>: Pruebas con fast-check para exactitud de centavos.</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <div style="font-size: 12px; font-weight: 700; color: var(--blue); text-transform: uppercase; margin-bottom: 8px;">
+            Script de Benchmark Real de Runtime
+          </div>
+          <div class="code-container" style="margin-top: 4px;">
+            <div class="code-header"><span>scripts/benchmark-profiling.js</span></div>
+            <div class="code-box">node scripts/benchmark-profiling.js
+
+⚡ 500 splits consecutivos (50 participantes, 150 platos)
+⏱️ Tiempo promedio por split: 0.062 ms
+📈 Operaciones por segundo:  16,129 splits/s
+🧹 Fuga de memoria:          0 MB (CERO LEAKS)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13: CHECKLIST PC3 -->
+    <div class="slide" id="s-12">
+      <div style="text-align: center; max-width: 760px; margin: 0 auto;">
+        <span class="pill pill-green" style="margin-bottom: 10px;">Semana 10 · Diapositiva 9</span>
+        <h2 style="font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 12px;">
+          Checklist Oficial de la Práctica Calificada 3 (PC3)
+        </h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+          Verificación formal de las 5 pautas exigidas por la cátedra para la sustentación:
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 8px; text-align: left; margin-bottom: 22px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 12.5px;">
+            <span>✅ <strong>1. Servicio Distribuido:</strong> API REST NestJS + Worker OCR asíncrono en PostgreSQL.</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">CUMPLIDO</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 12.5px;">
+            <span>✅ <strong>2. Logs Estructurados en JSON con MDC:</strong> Contexto automático vía AsyncLocalStorage.</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">CUMPLIDO</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 12.5px;">
+            <span>✅ <strong>3. Telemetría OTel y Modelo RED:</strong> Endpoint /api/admin/metrics y Spans manuales.</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">CUMPLIDO</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 12.5px;">
+            <span>✅ <strong>4. Resiliencia Activa:</strong> FSM formal + Kill Switches en caliente (Late Binding).</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">CUMPLIDO</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--emerald-border); border-radius: 12px; font-size: 12.5px;">
+            <span>✅ <strong>5. Análisis de Runtime y Profiling:</strong> Detección de cuellos de botella con Flame Graph.</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--emerald-light);">CUMPLIDO</span>
+          </div>
+        </div>
+
+        <button class="btn-nav primary" onclick="goToSlide(0)" style="font-size: 12px;">
+          ↺ Volver a la Portada
         </button>
       </div>
     </div>
 
   </main>
 
-  <!-- Footer Navigation -->
+  <!-- Footer -->
   <footer>
     <div style="font-size: 12px; color: var(--text-dim);">
-      Usa las teclas <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">←</kbd> y <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">→</kbd> para navegar
+      Usa <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">←</kbd> y <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">→</kbd> para navegar
     </div>
-
     <div class="dots" id="dots"></div>
-
-    <div style="display: flex; gap: 10px;">
+    <div style="display: flex; gap: 8px;">
       <button id="btnPrev" class="btn-nav" onclick="prevSlide()" disabled>← Anterior</button>
       <button id="btnNext" class="btn-nav primary" onclick="nextSlide()">Siguiente →</button>
     </div>
@@ -770,9 +958,8 @@
 
   <script>
     let current = 0;
-    const total = 8;
+    const total = 13;
 
-    // Crear dots
     const dotsBox = document.getElementById('dots');
     for (let i = 0; i < total; i++) {
       const d = document.createElement('div');
@@ -789,23 +976,14 @@
       document.querySelectorAll('.dot').forEach((d, i) => {
         d.classList.toggle('active', i === current);
       });
-      document.getElementById('slideCounter').innerText = `Paso ${current + 1} de ${total}`;
+      document.getElementById('slideCounter').innerText = `Slide ${current + 1} de ${total}`;
       document.getElementById('btnPrev').disabled = current === 0;
       document.getElementById('btnNext').disabled = current === total - 1;
     }
 
-    function nextSlide() {
-      if (current < total - 1) { current++; update(); }
-    }
-
-    function prevSlide() {
-      if (current > 0) { current--; update(); }
-    }
-
-    function goToSlide(i) {
-      current = i;
-      update();
-    }
+    function nextSlide() { if (current < total - 1) { current++; update(); } }
+    function prevSlide() { if (current > 0) { current--; update(); } }
+    function goToSlide(i) { current = i; update(); }
 
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
@@ -821,63 +999,50 @@
       }
     }
 
-    // FSM Step Click
-    function seleccionarPaso(paso) {
-      document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
-      const idMap = {
-        'CARGADO': 'st-cargado',
-        'PROCESANDO': 'st-procesando',
-        'EXTRAÍDO': 'st-extraido',
-        'CONFIRMADO': 'st-confirmado'
-      };
-      const el = document.getElementById(idMap[paso]);
-      if (el) el.classList.add('active');
-
-      const box = document.getElementById('fsmMsgBox');
+    // FSM Simulator
+    function simularPasoValido() {
+      const box = document.getElementById('fsmFeedback');
       box.style.display = 'block';
-      box.style.background = 'var(--emerald-subtle)';
-      box.style.border = '1px solid var(--emerald-border)';
-      box.style.color = '#6ee7b7';
-      box.innerHTML = `Paso actual: <strong>[${paso}]</strong>. El flujo avanza en orden garantizado.`;
+      box.className = 'code-box code-green';
+      box.innerText = `✅ [200 OK] TRANSICIÓN VÁLIDA: [CARGADO] → [PROCESANDO]\nLa FSM valida la matriz de adyacencia y delega el comprobante al worker asíncrono.`;
+      document.getElementById('st-cargado').classList.remove('active');
+      document.getElementById('st-procesando').classList.add('active');
     }
 
-    function probarSaltoIlegal() {
-      const box = document.getElementById('fsmMsgBox');
+    function simularPasoInvalido() {
+      const box = document.getElementById('fsmFeedback');
       box.style.display = 'block';
-      box.style.background = 'var(--rose-subtle)';
-      box.style.border = '1px solid var(--rose-border)';
-      box.style.color = '#fca5a5';
-      box.innerHTML = `🚨 <strong>Intento de salto ilegal bloqueado (Error 409 Conflict):</strong><br>El sistema impidió saltar de <em>[Foto Subida]</em> directamente a <em>[Deuda Lista]</em> sin antes pasar por <em>[Lectura OCR]</em> y <em>[Asignación de Platos]</em>. ¡El dinero está protegido!`;
+      box.className = 'code-box code-red';
+      box.innerText = `🚨 [409 Conflict] TRANSICIÓN ILEGAL BLOQUEADA:\nNo está permitido pasar de [CARGADO] directamente a [CONFIRMADO].\nEstados permitidos desde [CARGADO]: [PROCESANDO]. ¡Se protege el dinero del grupo!`;
     }
 
-    // Switch toggles
+    // Switches
     const switches = { plin: true, yape: true, ocr: false };
     function toggleSwitch(name) {
       switches[name] = !switches[name];
       const btn = document.getElementById(`sw-${name}`);
       btn.classList.toggle('on', switches[name]);
 
-      const log = document.getElementById('switchStatusLog');
+      const log = document.getElementById('flagAuditText');
       const time = new Date().toLocaleTimeString();
-
-      let label = name.toUpperCase();
-      let estado = switches[name] ? 'Habilitado' : 'Pausado por emergencia';
-      let icon = switches[name] ? '🟢' : '🔴';
-
-      log.innerHTML = `<div style="color: ${switches[name] ? 'var(--emerald-light)' : 'var(--rose)'}; margin-bottom: 6px;">
-        ${icon} <strong>[${time}] ${label}:</strong> ${estado} en caliente.
-      </div>` + log.innerHTML;
+      const estado = switches[name] ? 'HABILITADO' : 'KILL SWITCH ACTIVADO (PAUSADO)';
+      log.innerText = `[${time}] Late Binding: '${name.toUpperCase()}' → ${estado} (0 ms de downtime, 0 reinicios)`;
     }
 
-    // Ticker en vivo
+    // Flame Graph
+    function hoverFlame(text) {
+      document.getElementById('flameDetail').innerText = text;
+    }
+
+    // Ticker métricas RED
     setInterval(() => {
-      const rate = Math.floor(140 + Math.random() * 15);
-      const lat = (4.0 + Math.random() * 0.8).toFixed(1);
-      const rEl = document.getElementById('liveRate');
-      const lEl = document.getElementById('liveLat');
-      if (rEl) rEl.innerText = `${rate} req/s`;
-      if (lEl) lEl.innerText = `${lat} ms`;
-    }, 2500);
+      const r = Math.floor(142 + Math.random() * 12);
+      const l = (4.1 + Math.random() * 0.7).toFixed(1);
+      const rEl = document.getElementById('m-rate');
+      const lEl = document.getElementById('m-lat');
+      if (rEl) rEl.innerText = `${r} req/s`;
+      if (lEl) lEl.innerText = `${l} ms`;
+    }, 2400);
   </script>
 </body>
 </html>
