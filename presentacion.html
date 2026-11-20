@@ -77,7 +77,7 @@
       display: none;
       width: 100%;
       height: 100%;
-      padding: 28px 46px;
+      padding: 30px 48px;
       flex-direction: column;
       justify-content: flex-start;
       gap: 14px;
@@ -98,9 +98,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      margin-bottom: 0px;
       padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     }
 
     .topic-pill {
@@ -132,7 +132,7 @@
 
     /* Títulos */
     .slide-header {
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
 
     .slide-title {
@@ -401,6 +401,7 @@
         <div style="font-size: 11.5px; color: var(--text-subtle); font-family: 'JetBrains Mono';">
           Facultad de Ingeniería Industrial y de Sistemas · Universidad Nacional de Ingeniería
         </div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 2: HOJA DE RUTA UNIDAD 3 -->
@@ -409,7 +410,8 @@
         <span class="topic-pill">MARCO METODOLÓGICO</span>
         <span class="slide-counter">02 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">Evolución Arquitectónica del Sistema</h2>
           <p class="slide-desc">Progresión desde la tolerancia a fallas hacia la configurabilidad en caliente y el diagnóstico continuo.</p>
         </div>
@@ -436,6 +438,7 @@
             </p>
           </div>
         </div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 3: ARQUITECTURA DISTRIBUIDA -->
@@ -444,7 +447,8 @@
         <span class="topic-pill">REQUISITO PC3 · TOPOLOGÍA</span>
         <span class="slide-counter">03 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">Topología de Servicios Desacoplados</h2>
           <p class="slide-desc">Aislamiento de responsabilidades para garantizar baja latencia en la interacción del usuario.</p>
         </div>
@@ -472,15 +476,17 @@
             </ul>
           </div>
         </div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 4: TABLAS DE DECISIÓN O(1) -->
-    <div class="slide" id="slide-3">
+    <div class="slide-page slide" id="slide-3">
       <div class="top-bar">
         <span class="topic-pill">SEMANA 9 · CONSTRUCCIÓN DIRIGIDA POR DATOS</span>
         <span class="slide-counter">04 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">Tablas de Decisión: Reglas de Pago en O(1)</h2>
           <p class="slide-desc">Sustitución de estructuras condicionales acopladas por tablas de consulta indexadas en memoria.</p>
         </div>
@@ -511,6 +517,7 @@
 }</div>
           </div>
         </div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 5: FSM DE COMPROBANTES -->
@@ -519,7 +526,8 @@
         <span class="topic-pill">SEMANA 9 · AUTÓMATAS FORMALES</span>
         <span class="slide-counter">05 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">Máquina de Estados Finitos (FSM)</h2>
           <p class="slide-desc">Garantía formal de integridad: prevención matemática de estados inconsistentes en la base de datos.</p>
         </div>
@@ -552,6 +560,7 @@
 ]);</div>
           </div>
         </div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 6: SIMULACIÓN INTERACTIVA FSM -->
@@ -560,7 +569,8 @@
         <span class="topic-pill">SEMANA 9 · DEMOSTRACIÓN EN VIVO</span>
         <span class="slide-counter">06 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">Verificación de Transiciones en Tiempo Real</h2>
           <p class="slide-desc">Demostración interactiva del autómata rechazando transiciones ilegales.</p>
         </div>
@@ -584,6 +594,7 @@
         </div>
 
         <div id="terminalFsm" class="code-editor" style="display: none; padding: 12px; font-size: 11.5px;"></div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 7: FEATURE FLAGS Y LATE BINDING -->
@@ -592,7 +603,8 @@
         <span class="topic-pill">SEMANA 9 · RESILIENCIA OPERATIVA</span>
         <span class="slide-counter">07 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">Enlace Tardío y Banderas de Características</h2>
           <p class="slide-desc">Modificación de la estrategia de ejecución en tiempo de ejecución sin suspender el servicio.</p>
         </div>
@@ -621,6 +633,7 @@ featureFlags.set(<span class="code-str">'MODO_MANUAL_FORZADO'</span>, <span clas
 <span class="code-comment">// Conmutación en caliente en 0 ms de latencia</span></div>
           </div>
         </div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 8: LOS TRES PILARES DE OBSERVABILIDAD -->
@@ -629,7 +642,8 @@ featureFlags.set(<span class="code-str">'MODO_MANUAL_FORZADO'</span>, <span clas
         <span class="topic-pill">SEMANA 10 · TEORÍA DE OBSERVABILIDAD</span>
         <span class="slide-counter">08 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">Los Tres Pilares de la Observabilidad</h2>
           <p class="slide-desc">Instrumentación intrínseca del código para explicar el comportamiento dinámico del sistema distribuido.</p>
         </div>
@@ -656,6 +670,7 @@ featureFlags.set(<span class="code-str">'MODO_MANUAL_FORZADO'</span>, <span clas
             </p>
           </div>
         </div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 9: LOGS CONTEXTUALES CON MDC -->
@@ -664,7 +679,8 @@ featureFlags.set(<span class="code-str">'MODO_MANUAL_FORZADO'</span>, <span clas
         <span class="topic-pill">SEMANA 10 · TRAZABILIDAD CONTEXTUAL</span>
         <span class="slide-counter">09 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">MDC: Mapped Diagnostic Context</h2>
           <p class="slide-desc">Inyección y propagación transparente de contexto asíncrono sin contaminar firmas de métodos.</p>
         </div>
@@ -695,6 +711,7 @@ featureFlags.set(<span class="code-str">'MODO_MANUAL_FORZADO'</span>, <span clas
             </ul>
           </div>
         </div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 10: MODELO RED Y PROMETHEUS -->
@@ -703,7 +720,8 @@ featureFlags.set(<span class="code-str">'MODO_MANUAL_FORZADO'</span>, <span clas
         <span class="topic-pill">SEMANA 10 · TELEMETRÍA Y MÉTRICAS</span>
         <span class="slide-counter">10 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">Métricas de Rendimiento: Modelo RED</h2>
           <p class="slide-desc">Supervisión en vivo de las tres variables doradas de servicio expuestas para Prometheus.</p>
         </div>
@@ -738,6 +756,7 @@ http_request_duration_ms{quantile="0.50"} 1.8
 http_request_duration_ms{quantile="0.95"} 4.2
 http_request_duration_ms{quantile="0.99"} 9.1</div>
         </div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 11: PROFILING Y FLAME GRAPH -->
@@ -746,7 +765,8 @@ http_request_duration_ms{quantile="0.99"} 9.1</div>
         <span class="topic-pill">SEMANA 10 · PERFILADO DE RUNTIME</span>
         <span class="slide-counter">11 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">Perfilado de Ejecución y Flame Graph</h2>
           <p class="slide-desc">Análisis de cuellos de botella en el algoritmo de reparto con 50 participantes y 150 ítems.</p>
         </div>
@@ -790,6 +810,7 @@ http_request_duration_ms{quantile="0.99"} 9.1</div>
             </p>
           </div>
         </div>
+      </div>
     </div>
 
     <!-- DIAPOSITIVA 12: SUITES DE PRUEBAS AUTOMATIZADAS -->
@@ -798,7 +819,8 @@ http_request_duration_ms{quantile="0.99"} 9.1</div>
         <span class="topic-pill">VERIFICACIÓN FORMAL</span>
         <span class="slide-counter">12 / 13</span>
       </div>
-      <div class="slide-header">
+      <div>
+        <div class="slide-header">
           <h2 class="slide-title">Verificación con Pruebas Automatizadas</h2>
           <p class="slide-desc">Garantía de regresión cero mediante suites unitarias y pruebas basadas en propiedades.</p>
         </div>
@@ -823,6 +845,7 @@ npm test test/telemetry.test.ts
 <span class="code-comment"># Benchmark formal de runtime y memoria:</span>
 node scripts/benchmark-profiling.js</div>
           </div>
+        </div>
       </div>
     </div>
 
