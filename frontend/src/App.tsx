@@ -20,6 +20,7 @@ import { MisDeudas } from './paginas/deudas/MisDeudas';
 import { HistorialDeuda } from './paginas/deudas/HistorialDeuda';
 import { Balance } from './paginas/balance/Balance';
 import { BandejaPagos } from './paginas/bandeja-pagos/BandejaPagos';
+import { PresentacionPC3 } from './paginas/presentacion/PresentacionPC3';
 
 const consulta = new QueryClient({
   defaultOptions: {
@@ -45,6 +46,9 @@ export function App() {
           <ProveedorSesion>
             <ProveedorToast>
               <Routes>
+                {/* Presentación interactiva moderna y minimalista para la sustentación PC3 */}
+                <Route path="/presentacion" element={<PresentacionPC3 />} />
+
                 <Route
                   path="/login"
                   element={

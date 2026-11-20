@@ -5,6 +5,8 @@ import { withTx, audit, updateRows } from '../../common/db';
 import { EventosService } from '../eventos/eventos.service';
 import { ComprobantesService } from '../comprobantes/comprobantes.service';
 import { computeSplit, CalcAssignment, CalcItem, SplitMode } from './split-calculator';
+import { RECEIPT_FSM } from '../../common/fsm';
+import { TelemetryService } from '../../common/telemetry.service';
 
 @Injectable()
 export class RepartoService {
@@ -12,6 +14,7 @@ export class RepartoService {
     private readonly dataSource: DataSource,
     private readonly eventos: EventosService,
     private readonly comprobantes: ComprobantesService,
+    private readonly telemetry: TelemetryService,
   ) {}
 
   async saveSplit(
@@ -58,13 +61,20 @@ export class RepartoService {
       items.map((i: { id: string; quantity: number }): [string, number] => [i.id, i.quantity]),
     );
 
-    const assignments = Array.isArray(body.assignments) ? body.assignments : [];
+    const assignments = body.assignments ?? [];
+    if (assignments.length === 0) throw validation('debes asignar al menos una unidad');
+
+    const seen = new Set<string>();
     for (const a of assignments) {
-      if (!itemMap.has(a.itemId)) throw validation('la asignación hace referencia a un ítem inexistente');
-      if (!Number.isInteger(a.unitIndex) || a.unitIndex < 1 || a.unitIndex > itemMap.get(a.itemId)!) {
-        throw validation('unidad de ítem inválida');
+      if (!itemMap.has(a.itemId)) throw validation('ítem no válido para este comprobante');
+      const maxUnits = itemMap.get(a.itemId)!;
+      if (!Number.isInteger(a.unitIndex) || a.unitIndex < 1 || a.unitIndex > maxUnits) {
+        throw validation(`unidad no válida: debe estar entre 1 y ${maxUnits}`);
       }
-      if (!participantIds.has(a.userId)) throw validation('la asignación debe ser a un participante del evento');
+      if (!participantIds.has(a.userId)) throw validation('participante no válido');
+      const key = `${a.itemId}:${a.unitIndex}`;
+      if (seen.has(key)) throw validation(`la unidad ${a.unitIndex} ya está asignada`);
+      seen.add(key);
     }
 
     await withTx(this.dataSource, async (em) => {
@@ -84,117 +94,122 @@ export class RepartoService {
     const receipt = await this.comprobantes.loadReceipt(receiptId, userId);
     if (receipt.payerId !== userId) throw forbidden('solo el pagador puede confirmar el comprobante');
 
-    const result = await withTx(this.dataSource, async (em) => {
-      const locked = await em.query(`SELECT * FROM receipts WHERE id = $1 FOR UPDATE`, [receiptId]);
-      const r = locked[0];
-      if (!r) throw conflict('comprobante inexistente');
-      if (r.status === 'CONFIRMADO') throw conflict('el comprobante ya está CONFIRMADO');
-      if (r.status !== 'EXTRAÍDO') throw conflict('el comprobante debe estar EXTRAÍDO para confirmar');
+    return this.telemetry.traceSpan(
+      'reparto.confirmSplit',
+      { receiptId, userId, eventId: receipt.eventId },
+      async () => {
+        return withTx(this.dataSource, async (em) => {
+          const locked = await em.query(`SELECT * FROM receipts WHERE id = $1 FOR UPDATE`, [receiptId]);
+          const r = locked[0];
+          if (!r) throw conflict('comprobante inexistente');
 
-      const mode = r.split_mode as SplitMode | null;
-      if (!mode) throw validation('configura el reparto antes de confirmar');
+          // Verificación formal mediante FSM
+          if (r.status === 'CONFIRMADO') throw conflict('el comprobante ya está CONFIRMADO');
+          if (r.status !== 'EXTRAÍDO') {
+            RECEIPT_FSM.assertTransition(r.status, 'CONFIRMADO', receiptId);
+            throw conflict('el comprobante debe estar EXTRAÍDO para confirmar');
+          }
 
-      const itemRows = await em.query(
-        `SELECT id, description, quantity, unit_price_cents FROM receipt_items WHERE receipt_id = $1 ORDER BY position`,
-        [receiptId],
-      );
-      const items: CalcItem[] = itemRows.map((i: Record<string, unknown>) => ({
-        id: i.id as string,
-        description: i.description as string,
-        quantity: Number(i.quantity),
-        unitPriceCents: Number(i.unit_price_cents),
-      }));
+          const mode = r.split_mode as SplitMode | null;
+          if (!mode) throw validation('configura el reparto antes de confirmar');
 
-      const participantRows = await em.query(
-        `SELECT user_id FROM event_participants WHERE event_id = $1 ORDER BY user_id`,
-        [r.event_id],
-      );
-      const tieBreakOrder: string[] = participantRows.map((p: { user_id: string }) => p.user_id);
+          const itemRows = await em.query(
+            `SELECT id, description, quantity, unit_price_cents FROM receipt_items WHERE receipt_id = $1 ORDER BY position`,
+            [receiptId],
+          );
+          const items: CalcItem[] = itemRows.map((i: Record<string, unknown>) => ({
+            id: i.id as string,
+            description: i.description as string,
+            quantity: Number(i.quantity),
+            unitPriceCents: Number(i.unit_price_cents),
+          }));
 
-      let participantIds: string[] = [];
-      let assignments: CalcAssignment[] = [];
-      if (mode === 'EQUITATIVE') {
-        const rows = await em.query(`SELECT user_id FROM split_participants WHERE receipt_id = $1`, [receiptId]);
-        participantIds = rows.map((x: { user_id: string }) => x.user_id);
-        if (participantIds.length === 0) {
-          // por defecto, todos los participantes
-          participantIds = tieBreakOrder;
-        }
-      } else {
-        const rows = await em.query(
-          `SELECT item_id, unit_index, user_id FROM item_assignments WHERE receipt_id = $1`,
-          [receiptId],
-        );
-        assignments = rows.map((x: Record<string, unknown>) => ({
-          itemId: x.item_id as string,
-          unitIndex: Number(x.unit_index),
-          userId: x.user_id as string,
-        }));
-      }
+          const participantRows = await em.query(
+            `SELECT user_id FROM event_participants WHERE event_id = $1 ORDER BY user_id`,
+            [r.event_id],
+          );
+          const tieBreakOrder: string[] = participantRows.map((p: { user_id: string }) => p.user_id);
 
-      const parts = computeSplit({
-        mode,
-        totalCents: Number(r.total_cents),
-        taxCents: Number(r.tax_cents),
-        tipCents: Number(r.tip_cents),
-        discountCents: Number(r.discount_cents),
-        items,
-        participantIds,
-        assignments,
-        tieBreakOrder,
-      });
+          let participantIds: string[] = [];
+          let assignments: CalcAssignment[] = [];
+          if (mode === 'EQUITATIVE') {
+            const rows = await em.query(`SELECT user_id FROM split_participants WHERE receipt_id = $1`, [receiptId]);
+            participantIds = rows.map((x: { user_id: string }) => x.user_id);
+            if (participantIds.length === 0) {
+              participantIds = tieBreakOrder;
+            }
+          } else {
+            const rows = await em.query(
+              `SELECT item_id, unit_index, user_id FROM item_assignments WHERE receipt_id = $1`,
+              [receiptId],
+            );
+            assignments = rows.map((x: Record<string, unknown>) => ({
+              itemId: x.item_id as string,
+              unitIndex: Number(x.unit_index),
+              userId: x.user_id as string,
+            }));
+          }
 
-      const debtorParts = parts.filter((p) => p.userId !== r.payer_id && p.cents > 0);
+          const parts = computeSplit({
+            mode,
+            totalCents: Number(r.total_cents),
+            taxCents: Number(r.tax_cents),
+            tipCents: Number(r.tip_cents),
+            discountCents: Number(r.discount_cents),
+            items,
+            participantIds,
+            assignments,
+            tieBreakOrder,
+          });
 
-      const updated = updateRows(
-        await em.query(
-          `UPDATE receipts SET status = 'CONFIRMADO', updated_at = now()
-           WHERE id = $1 AND status = 'EXTRAÍDO' RETURNING id`,
-          [receiptId],
-        ),
-      );
-      if (updated.length === 0) throw conflict('el comprobante ya está CONFIRMADO');
+          const debtorParts = parts.filter((p) => p.userId !== r.payer_id && p.cents > 0);
 
-      const debtSummary: { debtorId: string; amountCents: number }[] = [];
-      for (const part of debtorParts) {
-        await em.query(
-          `INSERT INTO debts (receipt_id, event_id, debtor_id, creditor_id, amount_cents, confirmed_cents, reserved_cents)
-           VALUES ($1, $2, $3, $4, $5, 0, 0)`,
-          [receiptId, r.event_id, part.userId, r.payer_id, part.cents],
-        );
-        debtSummary.push({ debtorId: part.userId, amountCents: part.cents });
-      }
+          const updated = updateRows(
+            await em.query(
+              `UPDATE receipts SET status = 'CONFIRMADO', updated_at = now()
+               WHERE id = $1 AND status = 'EXTRAÍDO' RETURNING id`,
+              [receiptId],
+            ),
+          );
+          if (updated.length === 0) throw conflict('el comprobante ya está CONFIRMADO');
 
-      await audit(em, {
-        userId,
-        operation: 'receipt.confirm',
-        resource: `receipt:${receiptId}`,
-        result: 'ok',
-      });
+          const debtSummary: { debtorId: string; amountCents: number }[] = [];
+          for (const part of debtorParts) {
+            await em.query(
+              `INSERT INTO debts (receipt_id, event_id, debtor_id, creditor_id, amount_cents, confirmed_cents, reserved_cents)
+               VALUES ($1, $2, $3, $4, $5, 0, 0)`,
+              [receiptId, r.event_id, part.userId, r.payer_id, part.cents],
+            );
+            debtSummary.push({ debtorId: part.userId, amountCents: part.cents });
+          }
 
-      const names = await em.query(
-        `SELECT d.amount_cents, u.username FROM debts d JOIN users u ON u.id = d.debtor_id
-         WHERE d.receipt_id = $1 ORDER BY u.username`,
-        [receiptId],
-      );
-      return {
-        receiptId,
-        status: 'CONFIRMADO' as const,
-        totalCents: Number(r.total_cents),
-        parts: parts.map((p) => ({ userId: p.userId, cents: p.cents })),
-        debts: names.map((n: Record<string, unknown>) => ({
-          debtor: n.username,
-          amountCents: Number(n.amount_cents),
-        })),
-        generated: debtSummary.length,
-      };
-    });
+          await audit(em, {
+            userId,
+            operation: 'receipt.confirm',
+            resource: `receipt:${receiptId}`,
+            result: 'ok',
+          });
 
-    await this.eventos.compensateCrossDebts(receipt.eventId, userId);
-    return result;
+          const names = await em.query(
+            `SELECT d.amount_cents, u.username FROM debts d JOIN users u ON u.id = d.debtor_id
+             WHERE d.receipt_id = $1 ORDER BY u.username`,
+            [receiptId],
+          );
+          return {
+            receiptId,
+            status: 'CONFIRMADO',
+            parts,
+            debts: names.map((n: { username: string; amount_cents: number }) => ({
+              debtor: n.username,
+              amountCents: Number(n.amount_cents),
+            })),
+          };
+        });
+      },
+    );
   }
 
-  private async clearSplit(em: import('typeorm').EntityManager, receiptId: string): Promise<void> {
+  private async clearSplit(em: any, receiptId: string): Promise<void> {
     await em.query(`DELETE FROM split_participants WHERE receipt_id = $1`, [receiptId]);
     await em.query(`DELETE FROM item_assignments WHERE receipt_id = $1`, [receiptId]);
   }

@@ -12,6 +12,7 @@ import { OcrModule } from './modules/ocr/ocr.module';
 import { RepartoModule } from './modules/reparto/reparto.module';
 import { PagosModule } from './modules/pagos/pagos.module';
 import { ConsultasModule } from './modules/consultas/consultas.module';
+import { DiagnosticsModule } from './modules/admin/diagnostics.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ConsultasModule } from './modules/consultas/consultas.module';
     RepartoModule,
     PagosModule,
     ConsultasModule,
+    DiagnosticsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AppExceptionFilter },
