@@ -12,9 +12,9 @@
   <style>
     :root {
       --bg: #07090e;
-      --deck-bg: #0c1019;
+      --deck-bg: #0c101a;
       --card-bg: rgba(255, 255, 255, 0.035);
-      --card-hover: rgba(255, 255, 255, 0.055);
+      --card-hover: rgba(255, 255, 255, 0.06);
       --border: rgba(255, 255, 255, 0.09);
       --border-focus: rgba(255, 255, 255, 0.22);
       
@@ -45,43 +45,62 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      background: radial-gradient(circle at 50% 12%, #111a2f 0%, var(--bg) 82%);
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 12%, #111a2f 0%, var(--bg) 85%);
       color: var(--text-main);
       font-family: 'Inter', sans-serif;
-      min-height: 100vh;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 14px;
-      overflow-x: hidden;
+      padding: 12px 20px;
     }
 
-    /* Contenedor Principal: 16:9 Canvas tipo Apple Keynote / Linear */
+    /* Contenedor Principal: Se adapta fluidamente para ocupar la pantalla sin zoom manual */
     .slide-viewport {
       width: 100%;
-      max-width: 1140px;
+      height: calc(100vh - 68px);
+      max-width: min(1500px, 96vw, calc((100vh - 72px) * 16 / 9));
+      max-height: calc(min(1500px, 96vw) * 9 / 16);
       aspect-ratio: 16 / 9;
       background: var(--deck-bg);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.85), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      box-shadow: 0 25px 80px -20px rgba(0, 0, 0, 0.9), 0 0 1px 1px rgba(255, 255, 255, 0.05);
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
 
+    /* Modo Pantalla Completa nativo */
+    :fullscreen .slide-viewport,
+    :-webkit-full-screen .slide-viewport {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100vw;
+      max-height: 100vh;
+      aspect-ratio: auto;
+      border-radius: 0;
+      border: none;
+    }
+
     .slide {
       display: none;
       width: 100%;
       height: 100%;
-      padding: 24px 44px;
+      padding: clamp(18px, 3vh, 32px) clamp(24px, 4vw, 48px);
       flex-direction: column;
       justify-content: flex-start;
-      gap: 12px;
-      animation: slideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      gap: clamp(8px, 1.6vh, 16px);
+      animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
     }
 
     .slide.active {
@@ -89,17 +108,18 @@
     }
 
     @keyframes slideIn {
-      from { opacity: 0; transform: translateY(5px); }
+      from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Barra Superior de la Diapositiva */
+    /* Barra Superior */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding-bottom: 8px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      flex-shrink: 0;
     }
 
     .topic-pill {
@@ -120,7 +140,7 @@
 
     .slide-counter {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
+      font-size: 12px;
       color: var(--text-subtle);
       font-weight: 600;
       background: rgba(255, 255, 255, 0.03);
@@ -131,40 +151,41 @@
 
     /* Encabezado */
     .slide-header {
-      margin-bottom: 2px;
+      flex-shrink: 0;
     }
 
     .slide-title {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 25px;
+      font-size: clamp(22px, 3.2vh, 28px);
       font-weight: 800;
       color: #ffffff;
       line-height: 1.25;
       letter-spacing: -0.4px;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
 
     .slide-desc {
-      font-size: 13px;
+      font-size: clamp(12.5px, 1.8vh, 14.5px);
       color: var(--text-muted);
       line-height: 1.45;
     }
 
-    /* Contenedor flexible que llena verticalmente la lámina */
+    /* Contenedor de contenido de diapositiva */
     .slide-body {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       min-height: 0;
+      overflow: hidden;
     }
 
     /* Grillas */
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      gap: clamp(10px, 2vw, 18px);
       flex: 1;
       min-height: 0;
     }
@@ -172,20 +193,21 @@
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
+      gap: clamp(10px, 1.8vw, 16px);
       flex: 1;
       min-height: 0;
     }
 
-    /* Tarjetas que se estiran para llenar el alto disponible */
+    /* Tarjetas */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 16px 18px;
+      padding: clamp(12px, 2vh, 18px) clamp(14px, 2vw, 20px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      min-height: 0;
       transition: border-color 0.2s ease, background 0.2s ease;
     }
 
@@ -196,37 +218,35 @@
 
     .card-title {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 14px;
+      font-size: clamp(13px, 1.9vh, 15px);
       font-weight: 700;
       color: #ffffff;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
     .card-text {
-      font-size: 12.5px;
+      font-size: clamp(11.5px, 1.6vh, 13px);
       color: var(--text-muted);
-      line-height: 1.55;
+      line-height: 1.5;
     }
 
-    /* Editores de Código */
+    /* Cajas de Código */
     .code-editor {
       background: #05070d;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 8px 12px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-size: clamp(10px, 1.45vh, 11.5px);
       color: #e2e8f0;
-      line-height: 1.5;
+      line-height: 1.45;
       overflow-x: auto;
       margin-top: 6px;
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      min-height: 0;
     }
 
     .code-comment { color: #64748b; }
@@ -258,23 +278,19 @@
       background: rgba(255, 255, 255, 0.025);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px 16px;
-      margin-top: 8px;
+      padding: clamp(6px, 1.2vh, 10px) 14px;
+      flex-shrink: 0;
     }
 
-    .stat-item {
-      text-align: center;
-    }
-
+    .stat-item { text-align: center; }
     .stat-val {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 17px;
+      font-size: clamp(14px, 2.2vh, 18px);
       font-weight: 800;
       color: #fff;
     }
-
     .stat-lbl {
-      font-size: 10.5px;
+      font-size: clamp(9.5px, 1.3vh, 11px);
       color: var(--text-subtle);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -286,22 +302,23 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      padding: 10px 14px;
+      gap: 6px;
+      padding: clamp(6px, 1.2vh, 10px) 12px;
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid var(--border);
       border-radius: 10px;
+      flex-shrink: 0;
     }
 
     .fsm-node {
       flex: 1;
-      padding: 9px 6px;
+      padding: clamp(6px, 1vh, 8px) 4px;
       text-align: center;
       background: rgba(255, 255, 255, 0.025);
       border: 1px solid var(--border);
       border-radius: 8px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-size: clamp(10px, 1.4vh, 11.5px);
       font-weight: 700;
       color: var(--text-muted);
       transition: all 0.2s ease;
@@ -317,52 +334,45 @@
     .fsm-arrow {
       color: var(--text-subtle);
       font-weight: bold;
-      font-size: 12px;
+      font-size: 11px;
     }
 
-    /* Barras de Flame Graph */
-    .flame-row {
-      margin-bottom: 8px;
-    }
+    /* Flame Graph */
+    .flame-row { margin-bottom: 6px; }
     .flame-label {
       display: flex;
       justify-content: space-between;
-      font-size: 11.5px;
+      font-size: clamp(10.5px, 1.5vh, 12px);
       margin-bottom: 3px;
       color: var(--text-muted);
     }
     .flame-track {
-      height: 12px;
+      height: clamp(8px, 1.4vh, 12px);
       background: rgba(255, 255, 255, 0.05);
       border-radius: 6px;
       overflow: hidden;
       display: flex;
     }
-    .flame-seg-io {
-      background: linear-gradient(90deg, #2563eb, #3b82f6);
-      height: 100%;
-    }
-    .flame-seg-cpu {
-      background: linear-gradient(90deg, #059669, #10b981);
-      height: 100%;
-    }
+    .flame-seg-io { background: linear-gradient(90deg, #2563eb, #3b82f6); height: 100%; }
+    .flame-seg-cpu { background: linear-gradient(90deg, #059669, #10b981); height: 100%; }
 
     /* Barra de Navegación */
     .nav-bar {
       width: 100%;
-      max-width: 1140px;
+      max-width: min(1500px, 96vw);
+      height: 48px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 12px;
       padding: 0 4px;
+      flex-shrink: 0;
     }
 
     .nav-btn {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
       color: var(--text-main);
-      padding: 7px 16px;
+      padding: 6px 14px;
       border-radius: 8px;
       font-size: 12px;
       font-weight: 600;
@@ -376,24 +386,11 @@
       background: rgba(255, 255, 255, 0.1);
       border-color: var(--border-focus);
     }
-    .nav-btn:disabled {
-      opacity: 0.25;
-      cursor: not-allowed;
-    }
-    .nav-btn.primary {
-      background: #059669;
-      border-color: var(--emerald-border);
-      color: #fff;
-    }
-    .nav-btn.primary:hover:not(:disabled) {
-      background: #10b981;
-    }
+    .nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+    .nav-btn.primary { background: #059669; border-color: var(--emerald-border); color: #fff; }
+    .nav-btn.primary:hover:not(:disabled) { background: #10b981; }
 
-    .dots-container {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
+    .dots-container { display: flex; gap: 6px; align-items: center; }
     .dot {
       width: 7px;
       height: 7px;
@@ -402,11 +399,7 @@
       cursor: pointer;
       transition: all 0.25s ease;
     }
-    .dot.active {
-      width: 22px;
-      border-radius: 999px;
-      background: var(--emerald);
-    }
+    .dot.active { width: 22px; border-radius: 999px; background: var(--emerald); }
 
     .kb-hint {
       font-family: 'JetBrains Mono', monospace;
@@ -417,7 +410,7 @@
 </head>
 <body>
 
-  <!-- VIEWPORT 16:9 -->
+  <!-- VIEWPORT 16:9 FLUIDO -->
   <div class="slide-viewport" id="viewport">
 
     <!-- DIAPOSITIVA 1: PORTADA -->
@@ -426,15 +419,15 @@
         <span class="topic-pill">EVALUACIÓN OFICIAL PC3 · GRUPO 2</span>
         <span class="slide-counter">SW707 · CICLO 2026-II</span>
       </div>
-      <div class="slide-body" style="justify-content: center; text-align: center; max-width: 860px; margin: 0 auto;">
+      <div class="slide-body" style="justify-content: center; text-align: center; max-width: 900px; margin: 0 auto; width: 100%;">
         <div>
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--emerald); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; display: block;">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--emerald); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; display: block;">
             Construcción de Software II
           </span>
-          <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 33px; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 12px;">
+          <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(26px, 4vh, 34px); font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 12px;">
             Arquitectura Dirigida por Datos y Observabilidad de Runtime
           </h1>
-          <p style="font-size: 14.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+          <p style="font-size: clamp(13px, 2vh, 15px); color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
             Transición desde lógica condicional imperativa hacia autómatas finitos declarativos, reglas <span style="font-family:'JetBrains Mono'; color:#34d399;">O(1)</span>, trazabilidad distribuida con MDC y perfilado de rendimiento en <strong>SplitVision</strong>.
           </p>
         </div>
@@ -442,15 +435,15 @@
         <!-- Integrantes -->
         <div style="display: flex; justify-content: center; gap: 14px; margin-bottom: 20px;">
           <div class="card" style="padding: 12px 20px; text-align: left; flex: 1; max-width: 260px;">
-            <div style="font-size: 13px; font-weight: 700; color: #fff;">Gonzalo Albornoz</div>
+            <div style="font-size: 13.5px; font-weight: 700; color: #fff;">Gonzalo Albornoz</div>
             <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--text-subtle);">20232551K</div>
           </div>
           <div class="card" style="padding: 12px 20px; text-align: left; flex: 1; max-width: 260px;">
-            <div style="font-size: 13px; font-weight: 700; color: #fff;">Luis Angel Vargas</div>
+            <div style="font-size: 13.5px; font-weight: 700; color: #fff;">Luis Angel Vargas</div>
             <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--text-subtle);">20231314E</div>
           </div>
           <div class="card" style="padding: 12px 20px; text-align: left; flex: 1; max-width: 260px;">
-            <div style="font-size: 13px; font-weight: 700; color: #fff;">Farid Zamudio</div>
+            <div style="font-size: 13.5px; font-weight: 700; color: #fff;">Farid Zamudio</div>
             <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--text-subtle);">20231215G</div>
           </div>
         </div>
@@ -475,13 +468,13 @@
         <div class="grid-3">
           <div class="card">
             <div>
-              <span class="tag tag-blue" style="margin-bottom: 8px;">SEMANAS 1 – 8</span>
+              <span class="tag tag-blue" style="margin-bottom: 6px;">SEMANAS 1 – 8</span>
               <div class="card-title">1. Resiliencia y Concurrencia</div>
               <p class="card-text">
                 Programación defensiva, contratos estrictos, transacciones ACID con bloqueos pesimistas para prevenir doble cobro y aislamiento en PostgreSQL.
               </p>
             </div>
-            <div class="code-editor" style="margin-top: 10px;">
+            <div class="code-editor" style="margin-top: 8px;">
               <span class="code-comment">// Bloqueo pesimista:</span><br>
               SELECT * FROM cuentas<br>
               WHERE id = $1 <span class="code-keyword">FOR UPDATE</span>;
@@ -490,13 +483,13 @@
 
           <div class="card" style="border-color: var(--emerald-border); background: var(--emerald-glow);">
             <div>
-              <span class="tag tag-emerald" style="margin-bottom: 8px;">SEMANA 9</span>
+              <span class="tag tag-emerald" style="margin-bottom: 6px;">SEMANA 9</span>
               <div class="card-title">2. Lógica Dirigida por Datos</div>
               <p class="card-text">
                 Desacoplamiento de reglas de negocio: Máquinas de Estado Finito (FSM), tablas de decisión <span style="font-family:'JetBrains Mono'; color:#34d399;">O(1)</span> y Feature Flags reactivas sin reinicio.
               </p>
             </div>
-            <div class="code-editor" style="margin-top: 10px;">
+            <div class="code-editor" style="margin-top: 8px;">
               <span class="code-comment">// Búsqueda constante O(1):</span><br>
               <span class="code-keyword">const</span> r = PAYMENT_RULES[m];<br>
               <span class="code-keyword">if</span> (r.exigeFoto &amp;&amp; !v) ...
@@ -505,13 +498,13 @@
 
           <div class="card" style="border-color: var(--purple-border); background: var(--purple-glow);">
             <div>
-              <span class="tag tag-purple" style="margin-bottom: 8px;">SEMANA 10</span>
+              <span class="tag tag-purple" style="margin-bottom: 6px;">SEMANA 10</span>
               <div class="card-title">3. Observabilidad de Runtime</div>
               <p class="card-text">
                 Diagnóstico en producción: Logs estructurados JSON con MDC (<span style="font-family:'JetBrains Mono';">AsyncLocalStorage</span>), telemetría RED OpenTelemetry y Flame Graphs.
               </p>
             </div>
-            <div class="code-editor" style="margin-top: 10px;">
+            <div class="code-editor" style="margin-top: 8px;">
               <span class="code-comment">// Contexto asíncrono MDC:</span><br>
               traceId: <span class="code-str">"b4e7-91fa"</span>,<br>
               duration_ms: <span class="code-val">4.2</span>
@@ -530,7 +523,7 @@
           </div>
           <div class="stat-item">
             <div class="stat-val" style="color: var(--purple);">&lt; 30 Segundos</div>
-            <div class="stat-lbl">Para Diagnosticar Fallas con MDC</div>
+            <div class="stat-lbl">Diagnóstico con MDC</div>
           </div>
         </div>
       </div>
@@ -547,31 +540,30 @@
         <p class="slide-desc">Aislamiento estricto de responsabilidades para garantizar baja latencia en la interacción del usuario.</p>
       </div>
       <div class="slide-body">
-        <!-- Diagrama de Flujo Arquitectónico -->
-        <div class="fsm-pipeline" style="justify-content: center; gap: 16px;">
-          <div class="fsm-node" style="max-width: 200px;">📱 Cliente Web / Móvil</div>
+        <div class="fsm-pipeline" style="justify-content: center; gap: 12px;">
+          <div class="fsm-node" style="max-width: 190px;">📱 Cliente Web / Móvil</div>
           <span class="fsm-arrow">── HTTP REST ──►</span>
-          <div class="fsm-node active" style="max-width: 220px;">🌐 API Gateway (NestJS)</div>
+          <div class="fsm-node active" style="max-width: 210px;">🌐 API Gateway (NestJS)</div>
           <span class="fsm-arrow">── SKIP LOCKED ──►</span>
-          <div class="fsm-node" style="max-width: 220px;">📦 Cola PostgreSQL</div>
+          <div class="fsm-node" style="max-width: 200px;">📦 Cola PostgreSQL</div>
           <span class="fsm-arrow">── Job Asíncrono ──►</span>
-          <div class="fsm-node" style="max-width: 200px;">⚙️ Worker Tesseract OCR</div>
+          <div class="fsm-node" style="max-width: 190px;">⚙️ Worker Tesseract OCR</div>
         </div>
 
         <div class="grid-2">
           <div class="card">
             <div>
               <div class="card-title">🌐 API REST Principal (NestJS + TypeScript)</div>
-              <p class="card-text" style="margin-bottom: 10px;">
+              <p class="card-text" style="margin-bottom: 8px;">
                 Diseñada para responder en menos de <strong>10 ms</strong> las solicitudes concurrentes de los usuarios:
               </p>
-              <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.7; padding-left: 18px;">
+              <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.6; padding-left: 18px;">
                 <li>Gestión de salas de comensales, autenticación y cálculo de reparto.</li>
                 <li>Al recibir una boleta, responde inmediatamente con estado <code>PROCESANDO</code>.</li>
                 <li><strong>No bloqueante:</strong> El cliente continúa interactuando sin congelamiento.</li>
               </ul>
             </div>
-            <div class="stat-strip" style="margin-top: 10px;">
+            <div class="stat-strip" style="margin-top: 8px;">
               <div class="stat-item">
                 <div class="stat-val" style="color: var(--emerald);">4.2 ms</div>
                 <div class="stat-lbl">Latencia p95</div>
@@ -586,16 +578,16 @@
           <div class="card">
             <div>
               <div class="card-title">⚙️ Worker Asíncrono de OCR (Proceso Autónomo)</div>
-              <p class="card-text" style="margin-bottom: 10px;">
+              <p class="card-text" style="margin-bottom: 8px;">
                 Aislado en segundo plano para no penalizar el bucle de eventos principal:
               </p>
-              <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.7; padding-left: 18px;">
+              <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.6; padding-left: 18px;">
                 <li>Consume de la cola <code>receipt_jobs</code> en PostgreSQL.</li>
-                <li>Lectura segura mediante <code>FOR UPDATE SKIP LOCKED</code> (sin colisiones entre workers).</li>
-                <li>Circuit Breaker (opossum): Si Tesseract colapsa, activa contingencia sin tumbar la API.</li>
+                <li>Lectura segura mediante <code>FOR UPDATE SKIP LOCKED</code> (sin colisiones).</li>
+                <li>Circuit Breaker (opossum): Si Tesseract colapsa, activa contingencia.</li>
               </ul>
             </div>
-            <div class="stat-strip" style="margin-top: 10px;">
+            <div class="stat-strip" style="margin-top: 8px;">
               <div class="stat-item">
                 <div class="stat-val" style="color: var(--purple);">SKIP LOCKED</div>
                 <div class="stat-lbl">Cero Deadlocks</div>
@@ -636,8 +628,8 @@
 } <span class="code-keyword">else if</span> (metodo === <span class="code-str">'EFECTIVO'</span> &amp;&amp; voucher) {
   <span class="code-comment">// Lógica redundante difícil de extender</span>
 }</div>
-            <div style="font-size: 11px; color: #fb7185; margin-top: 6px;">
-              ⚠️ Requiere modificar código y recompilar para agregar o cambiar reglas.
+            <div style="font-size: 11px; color: #fb7185; margin-top: 4px;">
+              ⚠️ Requiere modificar código y recompilar para agregar reglas.
             </div>
           </div>
 
@@ -654,7 +646,7 @@
 <span class="code-keyword">if</span> (regla.exigeEvidencia &amp;&amp; !voucher) {
   <span class="code-keyword">throw new</span> <span class="code-fn">BadRequestException</span>(regla.mensajeError);
 }</div>
-            <div style="font-size: 11px; color: #34d399; margin-top: 6px;">
+            <div style="font-size: 11px; color: #34d399; margin-top: 4px;">
               ✓ Búsqueda en 0.001 ms, modular, testeable de forma aislada.
             </div>
           </div>
@@ -667,11 +659,11 @@
           </div>
           <div class="stat-item">
             <div class="stat-val" style="color: var(--blue);">1 Línea</div>
-            <div class="stat-lbl">Para Agregar Método de Pago</div>
+            <div class="stat-lbl">Para Agregar Método</div>
           </div>
           <div class="stat-item">
             <div class="stat-val" style="color: var(--purple);">test/payment-rules.test.ts</div>
-            <div class="stat-lbl">100% Cobertura de Pruebas</div>
+            <div class="stat-lbl">100% Cobertura</div>
           </div>
         </div>
       </div>
@@ -702,18 +694,18 @@
           <div class="card">
             <div>
               <div class="card-title">Validación por Matriz de Transiciones</div>
-              <p class="card-text" style="line-height: 1.6; margin-bottom: 8px;">
+              <p class="card-text" style="line-height: 1.55; margin-bottom: 6px;">
                 El sistema no permite saltos arbitrarios. Si una solicitud intenta confirmar un comprobante que aún está en estado <code>CARGADO</code>, la FSM intercepta la operación y retorna <strong><code>409 Conflict</code></strong> de forma inmediata.
               </p>
-              <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.6; padding-left: 18px;">
+              <ul style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5; padding-left: 16px;">
                 <li>Cero estados huérfanos o comprobantes a medio procesar.</li>
                 <li>El estado terminal <code>CONFIRMADO</code> es inmutable por contrato.</li>
               </ul>
             </div>
-            <div class="stat-strip" style="margin-top: 10px;">
+            <div class="stat-strip" style="margin-top: 8px;">
               <div class="stat-item">
                 <div class="stat-val" style="color: var(--rose);">HTTP 409</div>
-                <div class="stat-lbl">Bloqueo de Salto Ilegal</div>
+                <div class="stat-lbl">Bloqueo Ilegal</div>
               </div>
               <div class="stat-item">
                 <div class="stat-val" style="color: var(--emerald);">Inmutable</div>
@@ -731,8 +723,8 @@
   { from: <span class="code-str">'EXTRAÍDO'</span>, to: [<span class="code-str">'CONFIRMADO'</span>] },
   { from: <span class="code-str">'CONFIRMADO'</span>, to: [] } <span class="code-comment">// Inmutable</span>
 ]);</div>
-            <div style="font-size: 11px; color: var(--text-subtle); margin-top: 6px;">
-              Archivo probado en <code>test/fsm.test.ts</code> (10/10 tests aprobados).
+            <div style="font-size: 11px; color: var(--text-subtle); margin-top: 4px;">
+              Probado en <code>test/fsm.test.ts</code> (10/10 tests aprobados).
             </div>
           </div>
         </div>
@@ -750,26 +742,26 @@
         <p class="slide-desc">Demostración interactiva del autómata rechazando transiciones ilegales.</p>
       </div>
       <div class="slide-body">
-        <div class="card" style="padding: 14px 18px;">
+        <div class="card" style="padding: 12px 16px; flex-shrink: 0;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <span style="font-size: 13.5px; font-weight: 700; color: #fff;">Consola de Pruebas FSM:</span>
             <span id="fsmLiveBadge" class="tag tag-emerald">ESTADO ACTUAL: CARGADO</span>
           </div>
-          <p class="card-text" style="margin-bottom: 10px;">
-            Comprobante registrado con ID <code>rec_2026_01</code>. Seleccione la operación que desea invocar:
+          <p class="card-text" style="margin-bottom: 8px;">
+            Comprobante registrado con ID <code>rec_2026_01</code>. Seleccione la operación a ejecutar:
           </p>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button class="nav-btn" onclick="simularTransicionValida()">
-              ▶ Transición Legal (1 → 2: Iniciar OCR)
+              ▶ Legal (1 → 2: OCR)
             </button>
             <button class="nav-btn" onclick="simularPasoExtraccion()">
-              ▶ Transición Legal (2 → 3: Extraer Platos)
+              ▶ Legal (2 → 3: Extraer)
             </button>
             <button class="nav-btn" onclick="simularConfirmacion()">
-              ▶ Transición Legal (3 → 4: Confirmar)
+              ▶ Legal (3 → 4: Confirmar)
             </button>
             <button class="nav-btn" style="border-color: var(--rose-border); color: #fb7185;" onclick="simularSaltoInvalido()">
-              ✖ Salto Ilegal (1 → 4: Confirmar Directo)
+              ✖ Ilegal (1 → 4: Salto Directo)
             </button>
             <button class="nav-btn" onclick="resetFsmDemo()" style="margin-left: auto;">
               ↺ Reiniciar
@@ -777,8 +769,8 @@
           </div>
         </div>
 
-        <div id="terminalFsm" class="code-editor" style="padding: 12px; font-size: 11px; flex: 1; min-height: 140px;">
-<span class="code-comment">// Terminal interactiva lista. Haga clic en uno de los botones superiores para ejecutar una petición HTTP a la FSM...</span>
+        <div id="terminalFsm" class="code-editor" style="padding: 10px 14px; font-size: 11px; flex: 1; min-height: 120px;">
+<span class="code-comment">// Terminal interactiva lista. Haga clic en uno de los botones para invocar la FSM...</span>
         </div>
       </div>
     </div>
@@ -798,12 +790,12 @@
           <div class="card">
             <div>
               <div class="card-title">Panel de Control de Banderas (En Vivo)</div>
-              <p class="card-text" style="margin-bottom: 12px;">
+              <p class="card-text" style="margin-bottom: 10px;">
                 Permite conmutar la estrategia de extracción cuando Tesseract se sobrecarga:
               </p>
               
               <div style="display: flex; flex-direction: column; gap: 8px;">
-                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <div style="font-size: 12px; font-weight: 600; color: #fff;">Motor OCR Tesseract</div>
                     <div id="flagStatusText" style="font-size: 11px; color: #34d399; font-family: 'JetBrains Mono';">OCR_AUTOMATICO = TRUE</div>
@@ -811,7 +803,7 @@
                   <button class="nav-btn" onclick="conmutarFeatureFlag()">Alternar</button>
                 </div>
 
-                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <div style="font-size: 12px; font-weight: 600; color: #fff;">Modo Ingreso Manual Asistido</div>
                     <div id="flagManualText" style="font-size: 11px; color: var(--text-subtle); font-family: 'JetBrains Mono';">MODO_MANUAL = FALSE</div>
@@ -821,15 +813,15 @@
               </div>
             </div>
 
-            <div style="font-size: 11px; color: var(--emerald); margin-top: 8px;">
-              ✓ Latencia de conmutación: 0 ms. No requiere redeploy ni reinicio de contenedores Docker.
+            <div style="font-size: 11px; color: var(--emerald); margin-top: 6px;">
+              ✓ Latencia de conmutación: 0 ms. Sin redeploy ni reinicio de Docker.
             </div>
           </div>
 
           <div class="card">
             <div>
               <div class="card-title">Fundamento Técnico: Late Binding</div>
-              <p class="card-text" style="line-height: 1.6; margin-bottom: 8px;">
+              <p class="card-text" style="line-height: 1.5; margin-bottom: 6px;">
                 <strong>Enlace Tardío:</strong> La decisión algorítmica no se vincula durante la compilación en TypeScript, sino que se resuelve dinámicamente en memoria al momento de cada solicitud.
               </p>
             </div>
@@ -840,9 +832,6 @@
 } <span class="code-keyword">else</span> {
   <span class="code-keyword">return</span> <span class="code-keyword">this</span>.encolarTrabajoOCR(receiptId);
 }</div>
-            <div style="font-size: 11px; color: var(--text-subtle); margin-top: 6px;">
-              Tolerancia a fallos: Degradación elegante ante imágenes ilegibles o sobrecarga de CPU.
-            </div>
           </div>
         </div>
 
@@ -877,13 +866,13 @@
         <div class="grid-3">
           <div class="card">
             <div>
-              <span class="tag tag-blue" style="margin-bottom: 8px;">HISTORIAL CLÍNICO</span>
+              <span class="tag tag-blue" style="margin-bottom: 6px;">HISTORIAL CLÍNICO</span>
               <div class="card-title">1. Logs Estructurados</div>
               <p class="card-text">
                 Emisión de eventos en formato JSON enriquecida con metadatos contextuales (Trace ID, Usuario, IP) propagados automáticamente por petición.
               </p>
             </div>
-            <div class="code-editor" style="margin-top: 10px;">
+            <div class="code-editor" style="margin-top: 8px;">
               {<br>
               &nbsp;&nbsp;<span class="code-str">"event"</span>: <span class="code-str">"pago.creado"</span>,<br>
               &nbsp;&nbsp;<span class="code-str">"trace_id"</span>: <span class="code-str">"b4e7-91fa"</span><br>
@@ -893,13 +882,13 @@
 
           <div class="card">
             <div>
-              <span class="tag tag-emerald" style="margin-bottom: 8px;">SIGNOS VITALES</span>
+              <span class="tag tag-emerald" style="margin-bottom: 6px;">SIGNOS VITALES</span>
               <div class="card-title">2. Métricas RED</div>
               <p class="card-text">
                 Monitoreo continuo de <strong>Rate</strong> (peticiones/seg), <strong>Errors</strong> (tasa de fallos) y <strong>Duration</strong> (distribución de latencias en percentiles p50, p95, p99).
               </p>
             </div>
-            <div class="code-editor" style="margin-top: 10px;">
+            <div class="code-editor" style="margin-top: 8px;">
               rate: <span class="code-val">148 req/s</span><br>
               errors: <span class="code-val">0.01%</span><br>
               p95: <span class="code-val">4.2 ms</span>
@@ -908,13 +897,13 @@
 
           <div class="card">
             <div>
-              <span class="tag tag-purple" style="margin-bottom: 8px;">RESONANCIA MAGNÉTICA</span>
+              <span class="tag tag-purple" style="margin-bottom: 6px;">RESONANCIA MAGNÉTICA</span>
               <div class="card-title">3. Trazas Distribuidas</div>
               <p class="card-text">
                 Seguimiento causal del ciclo de vida de una transacción a través de las distintas capas de servicio y base de datos con Spans OpenTelemetry.
               </p>
             </div>
-            <div class="code-editor" style="margin-top: 10px;">
+            <div class="code-editor" style="margin-top: 8px;">
               span: <span class="code-str">"reparto.hamilton"</span><br>
               parent: <span class="code-str">"http.request"</span>
             </div>
@@ -928,7 +917,7 @@
           </div>
           <div class="stat-item">
             <div class="stat-val" style="color: var(--emerald);">OpenTelemetry</div>
-            <div class="stat-lbl">Estándar de la Industria</div>
+            <div class="stat-lbl">Estándar Industrial</div>
           </div>
           <div class="stat-item">
             <div class="stat-val" style="color: var(--purple);">Prometheus + Grafana</div>
@@ -938,7 +927,7 @@
       </div>
     </div>
 
-    <!-- DIAPOSITIVA 9: LOGS CONTEXTUALES CON MDC -->
+    <!-- DIAPOSITIVA 9: LOGS CONTEXTUALES CON MDC (SIN SUPERPOSICIÓN) -->
     <div class="slide" id="slide-8">
       <div class="top-bar">
         <span class="topic-pill">SEMANA 10 · TRAZABILIDAD CONTEXTUAL</span>
@@ -950,9 +939,15 @@
       </div>
       <div class="slide-body">
         <div class="grid-2">
+          <!-- Columna Izquierda: Registro JSON estructurado -->
           <div class="card">
-            <div class="card-title">Estructura del Registro JSON Emitido:</div>
-            <div class="code-editor">
+            <div>
+              <div class="card-title">Estructura del Registro JSON Emitido:</div>
+              <p class="card-text" style="margin-bottom: 6px;">
+                Cada evento en producción incluye metadatos de correlación inyectados automáticamente:
+              </p>
+            </div>
+            <div class="code-editor" style="font-size: 11px;">
 {
   <span class="code-str">"timestamp"</span>: <span class="code-str">"2026-11-20T21:40:12.304Z"</span>,
   <span class="code-str">"level"</span>: <span class="code-str">"INFO"</span>,
@@ -963,26 +958,28 @@
   <span class="code-str">"method"</span>: <span class="code-str">"YAPE"</span>,
   <span class="code-str">"amount_cents"</span>: <span class="code-val">4850</span>
 }</div>
-            <div style="font-size: 11px; color: var(--emerald); margin-top: 6px;">
-              ✓ Formato JSON estándar listo para ingesta en ELK, Loki o Datadog.
+            <div style="font-size: 11px; color: var(--emerald); margin-top: 4px;">
+              ✓ Listo para ingesta directa en ELK, Loki o Datadog.
             </div>
           </div>
 
+          <!-- Columna Derecha: Implementación técnica en TypeScript -->
           <div class="card">
             <div>
               <div class="card-title">Mapeo Asíncrono en TypeScript</div>
-              <p class="card-text" style="margin-bottom: 10px;">
-                En Java se emplea <code>org.slf4j.MDC</code> con ThreadLocal. En Node.js/TypeScript se implementa mediante <strong><code>AsyncLocalStorage</code></strong>:
+              <p class="card-text" style="margin-bottom: 6px;">
+                En Java se emplea <code>org.slf4j.MDC</code>. En Node.js/TypeScript se implementa mediante <strong><code>AsyncLocalStorage</code></strong>:
               </p>
-              <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.7; padding-left: 18px;">
-                <li>Un middleware HTTP intercepta la petición y genera el <code>trace_id</code>.</li>
-                <li>Cualquier servicio, helper o repositorio accede al contexto sin recibirlo como parámetro.</li>
-                <li>Aislamiento estricto: Concurrencia segura entre múltiples solicitudes simultáneas.</li>
+              <ul style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5; padding-left: 16px; margin-bottom: 6px;">
+                <li>Un middleware intercepta la petición y crea el contexto con <code>trace_id</code>.</li>
+                <li>Cualquier servicio accede al contexto sin recibirlo como argumento.</li>
+                <li>Aislamiento estricto: Cero colisión entre peticiones concurrentes.</li>
               </ul>
             </div>
-            <div class="code-editor" style="margin-top: 10px;">
+            <div class="code-editor">
 <span class="code-comment">// src/common/correlation.ts</span>
-<span class="code-keyword">export const</span> mdcStorage = <span class="code-keyword">new</span> <span class="code-fn">AsyncLocalStorage</span>&lt;MdcContext&gt;();</div>
+<span class="code-keyword">export const</span> mdcStorage = <span class="code-keyword">new</span> <span class="code-fn">AsyncLocalStorage</span>&lt;MdcContext&gt;();
+<span class="code-comment">// Propagación automática en todo el stack</span></div>
           </div>
         </div>
 
@@ -1003,7 +1000,7 @@
       </div>
     </div>
 
-    <!-- DIAPOSITIVA 10: MODELO RED Y PROMETHEUS -->
+    <!-- DIAPOSITIVA 10: MODELO RED Y PROMETHEUS (COMPLETAMENTE REDISEÑADA Y ESPACIOSA) -->
     <div class="slide" id="slide-9">
       <div class="top-bar">
         <span class="topic-pill">SEMANA 10 · TELEMETRÍA Y MÉTRICAS</span>
@@ -1014,59 +1011,95 @@
         <p class="slide-desc">Supervisión en vivo de las tres variables doradas de servicio expuestas para Prometheus.</p>
       </div>
       <div class="slide-body">
-        <div class="grid-3" style="flex: 0 0 auto;">
-          <div class="card" style="text-align: center; padding: 12px 14px;">
-            <div class="tag tag-blue" style="margin-bottom: 2px;">RATE (TASA)</div>
-            <div id="liveRate" style="font-size: 26px; font-weight: 800; color: #fff; margin: 2px 0;">148 req/s</div>
-            <div style="font-size: 11px; color: var(--text-subtle);">Rendimiento sostenido</div>
-          </div>
-          <div class="card" style="text-align: center; padding: 12px 14px;">
-            <div class="tag tag-emerald" style="margin-bottom: 2px;">ERRORS (FALLOS)</div>
-            <div style="font-size: 26px; font-weight: 800; color: #34d399; margin: 2px 0;">0.01%</div>
-            <div style="font-size: 11px; color: var(--text-subtle);">Tasa de error HTTP 5xx</div>
-          </div>
-          <div class="card" style="text-align: center; padding: 12px 14px;">
-            <div class="tag tag-purple" style="margin-bottom: 2px;">DURATION (LATENCIA)</div>
-            <div id="liveDur" style="font-size: 26px; font-weight: 800; color: #fff; margin: 2px 0;">4.2 ms</div>
-            <div style="font-size: 11px; color: var(--text-subtle);">Percentil 95 (p95)</div>
-          </div>
-        </div>
-
         <div class="grid-2">
+          <!-- Columna 1: Panel Ejecutivo de Métricas RED + Percentiles -->
           <div class="card">
-            <div class="card-title">Distribución Percentil de Latencia (API)</div>
-            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
-              <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                <span>p50 (Mediana habitual):</span>
-                <span style="font-weight: 700; color: #34d399;">1.8 ms</span>
+            <div>
+              <div class="card-title">Signos Vitales del Backend (Tiempo Real)</div>
+              
+              <!-- 3 KPIs RED en fila compacta -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0 12px 0;">
+                <div style="background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center;">
+                  <span class="tag tag-blue" style="font-size: 9.5px; padding: 1px 5px;">RATE</span>
+                  <div id="liveRate" style="font-size: 20px; font-weight: 800; color: #fff; margin-top: 2px;">148 req/s</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center;">
+                  <span class="tag tag-emerald" style="font-size: 9.5px; padding: 1px 5px;">ERRORS</span>
+                  <div style="font-size: 20px; font-weight: 800; color: #34d399; margin-top: 2px;">0.01%</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center;">
+                  <span class="tag tag-purple" style="font-size: 9.5px; padding: 1px 5px;">DURATION</span>
+                  <div id="liveDur" style="font-size: 20px; font-weight: 800; color: #fff; margin-top: 2px;">4.2 ms</div>
+                </div>
               </div>
-              <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                <span>p90 (Carga normal):</span>
-                <span style="font-weight: 700; color: #60a5fa;">3.2 ms</span>
+
+              <!-- Tabla de Percentiles -->
+              <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;">
+                <div style="font-size: 11.5px; font-weight: 700; color: #fff; margin-bottom: 6px;">Distribución de Percentiles (SLA):</div>
+                <div style="display: flex; flex-direction: column; gap: 4px; font-size: 11.5px;">
+                  <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">p50 (Mediana habitual):</span>
+                    <strong style="color: #34d399;">1.8 ms</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">p90 (Carga normal):</span>
+                    <strong style="color: #60a5fa;">3.2 ms</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">p95 (Umbral de SLA):</span>
+                    <strong style="color: #c084fc;">4.2 ms</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">p99 (Peores casos):</span>
+                    <strong style="color: #fbbf24;">9.1 ms</strong>
+                  </div>
+                </div>
               </div>
-              <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                <span>p95 (Umbral de SLA):</span>
-                <span style="font-weight: 700; color: #c084fc;">4.2 ms</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                <span>p99 (Peores casos aislados):</span>
-                <span style="font-weight: 700; color: #fbbf24;">9.1 ms</span>
-              </div>
+            </div>
+
+            <div style="font-size: 11px; color: var(--emerald); margin-top: 6px;">
+              ✓ Latencias percentil garantizadas por debajo del SLA contractual de 10 ms.
             </div>
           </div>
 
+          <!-- Columna 2: Exposición Nativa para Prometheus -->
           <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <div class="card-title">Exportador Prometheus:</div>
-              <span class="tag tag-emerald">GET /api/admin/metrics</span>
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <div class="card-title" style="margin-bottom: 0;">Exportador Prometheus:</div>
+                <span class="tag tag-emerald">GET /api/admin/metrics</span>
+              </div>
+              <p class="card-text" style="margin-bottom: 6px;">
+                Formato estándar para raspado periódico y visualización en Grafana:
+              </p>
             </div>
-            <div class="code-editor" style="color: #94a3b8; font-size: 10.5px;">
-# HELP http_requests_total Total HTTP requests
+            <div class="code-editor" style="font-size: 11px; color: #94a3b8;">
+# HELP http_requests_total Total de peticiones HTTP
 http_requests_total 14820
+# HELP http_errors_total Total de errores 5xx
 http_errors_total{code="5xx"} 2
+# HELP http_request_duration_ms Latencia por percentil
 http_request_duration_ms{quantile="0.50"} 1.8
 http_request_duration_ms{quantile="0.95"} 4.2
 http_request_duration_ms{quantile="0.99"} 9.1</div>
+            <div style="font-size: 11px; color: var(--blue); margin-top: 6px;">
+              ✓ Compatible con alertmanager para notificación automática ante incidentes.
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-strip">
+          <div class="stat-item">
+            <div class="stat-val" style="color: var(--emerald);">4.2 ms</div>
+            <div class="stat-lbl">Percentil 95 (p95)</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" style="color: var(--rose);">0.01%</div>
+            <div class="stat-lbl">Tasa de Error 5xx</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" style="color: var(--purple);">Prometheus RED</div>
+            <div class="stat-lbl">Estándar de Observabilidad</div>
           </div>
         </div>
       </div>
@@ -1087,46 +1120,48 @@ http_request_duration_ms{quantile="0.99"} 9.1</div>
           <div class="card">
             <div>
               <div class="card-title">Benchmark del Algoritmo de Hamilton</div>
-              <div style="font-size: 24px; font-weight: 800; color: #fff; margin: 6px 0;">
+              <div style="font-size: 22px; font-weight: 800; color: #fff; margin: 4px 0;">
                 ⚡ 0.062 ms <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">por cálculo de reparto</span>
               </div>
-              <p class="card-text" style="margin-bottom: 10px;">
+              <p class="card-text" style="margin-bottom: 8px;">
                 Capacidad de procesar más de <strong>16,000 repartos equitativos por segundo</strong> en un solo hilo sin retención acumulativa de memoria ni fragmentación del Heap.
               </p>
-              <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.6; padding-left: 18px;">
+              <ul style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5; padding-left: 16px;">
                 <li>Reparto exacto de propina y centavos (mayor residuo).</li>
                 <li>Complejidad temporal estrictamente acotada a O(n log n).</li>
               </ul>
             </div>
-            <div style="margin-top: 8px;">
+            <div style="margin-top: 6px;">
               <span class="tag tag-blue">scripts/benchmark-profiling.js</span>
             </div>
           </div>
 
           <div class="card">
-            <div class="card-title">Distribución del Tiempo de Flama (Flame Graph)</div>
-            
-            <div class="flame-row">
-              <div class="flame-label">
-                <span>Persistencia y Bloqueos en PostgreSQL (I/O Bound)</span>
-                <span style="font-weight: 700; color: #60a5fa;">85% (24.1 ms)</span>
+            <div>
+              <div class="card-title">Distribución del Tiempo de Flama (Flame Graph)</div>
+              
+              <div class="flame-row">
+                <div class="flame-label">
+                  <span>Persistencia y Bloqueos en PostgreSQL (I/O Bound)</span>
+                  <span style="font-weight: 700; color: #60a5fa;">85% (24.1 ms)</span>
+                </div>
+                <div class="flame-track">
+                  <div class="flame-seg-io" style="width: 85%;"></div>
+                </div>
               </div>
-              <div class="flame-track">
-                <div class="flame-seg-io" style="width: 85%;"></div>
+
+              <div class="flame-row">
+                <div class="flame-label">
+                  <span>Cálculo de Restos Mayores en CPU (Hamilton distribute)</span>
+                  <span style="font-weight: 700; color: #34d399;">15% (1.5 ms)</span>
+                </div>
+                <div class="flame-track">
+                  <div class="flame-seg-cpu" style="width: 15%;"></div>
+                </div>
               </div>
             </div>
 
-            <div class="flame-row">
-              <div class="flame-label">
-                <span>Cálculo de Restos Mayores en CPU (Hamilton distribute)</span>
-                <span style="font-weight: 700; color: #34d399;">15% (1.5 ms)</span>
-              </div>
-              <div class="flame-track">
-                <div class="flame-seg-cpu" style="width: 15%;"></div>
-              </div>
-            </div>
-
-            <div class="code-editor" style="margin-top: 8px; font-size: 10.5px;">
+            <div class="code-editor" style="margin-top: 6px; font-size: 10.5px;">
 <span class="code-comment">// Conclusión formal del perfilado:</span>
 El sistema es estrictamente <span class="code-str">I/O-Bound</span>.
 Optimizar el algoritmo matemático es innecesario.
@@ -1140,12 +1175,12 @@ La escala debe abordarse con Pool de Conexiones y Réplicas.</div>
             <div class="stat-lbl">Repartos / Segundo</div>
           </div>
           <div class="stat-item">
-            <div class="stat-val" style="color: var(--blue);">0 Fugas de Memoria</div>
+            <div class="stat-val" style="color: var(--blue);">0 Fugas</div>
             <div class="stat-lbl">Heap Estable</div>
           </div>
           <div class="stat-item">
             <div class="stat-val" style="color: var(--purple);">I/O-Bound</div>
-            <div class="stat-lbl">Diagnóstico de Arquitectura</div>
+            <div class="stat-lbl">Diagnóstico Formal</div>
           </div>
         </div>
       </div>
@@ -1164,21 +1199,23 @@ La escala debe abordarse con Pool de Conexiones y Réplicas.</div>
       <div class="slide-body">
         <div class="grid-2">
           <div class="card">
-            <div class="card-title">Batería de Pruebas Unitarias e Integración</div>
-            <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.8; padding-left: 18px;">
-              <li><code>test/fsm.test.ts</code> (10 tests): Transiciones legales y rechazo de saltos 409.</li>
-              <li><code>test/payment-rules.test.ts</code> (8 tests): Búsqueda O(1) y evidencia obligatoria.</li>
-              <li><code>test/telemetry.test.ts</code> (9 tests): Propagación de MDC y percentiles RED.</li>
-              <li><code>test/properties.test.ts</code> (12 tests): Invariantes matemáticas con fast-check.</li>
-            </ul>
-            <div class="stat-strip" style="margin-top: 10px;">
+            <div>
+              <div class="card-title">Batería de Pruebas Unitarias e Integración</div>
+              <ul style="font-size: 11.5px; color: var(--text-muted); line-height: 1.6; padding-left: 16px;">
+                <li><code>test/fsm.test.ts</code> (10 tests): Transiciones legales y rechazo 409.</li>
+                <li><code>test/payment-rules.test.ts</code> (8 tests): Búsqueda O(1) y evidencia.</li>
+                <li><code>test/telemetry.test.ts</code> (9 tests): Propagación MDC y percentiles RED.</li>
+                <li><code>test/properties.test.ts</code> (12 tests): Invariantes con fast-check.</li>
+              </ul>
+            </div>
+            <div class="stat-strip" style="margin-top: 8px;">
               <div class="stat-item">
                 <div class="stat-val" style="color: var(--emerald);">39 / 39</div>
                 <div class="stat-lbl">Pruebas Aprobadas</div>
               </div>
               <div class="stat-item">
                 <div class="stat-val" style="color: var(--blue);">100%</div>
-                <div class="stat-lbl">Tasa de Aprobación</div>
+                <div class="stat-lbl">Tasa de Éxito</div>
               </div>
             </div>
           </div>
@@ -1203,11 +1240,11 @@ node scripts/benchmark-profiling.js</div>
         <div class="stat-strip">
           <div class="stat-item">
             <div class="stat-val" style="color: var(--emerald);">Jest Runner</div>
-            <div class="stat-lbl">Framework de Testing</div>
+            <div class="stat-lbl">Testing Unitario</div>
           </div>
           <div class="stat-item">
             <div class="stat-val" style="color: var(--blue);">fast-check</div>
-            <div class="stat-lbl">Pruebas por Propiedades</div>
+            <div class="stat-lbl">Property-based</div>
           </div>
           <div class="stat-item">
             <div class="stat-val" style="color: var(--purple);">Regresión Cero</div>
@@ -1224,33 +1261,33 @@ node scripts/benchmark-profiling.js</div>
         <span class="slide-counter">13 / 13</span>
       </div>
       <div class="slide-body" style="justify-content: center; max-width: 900px; margin: 0 auto; width: 100%;">
-        <div style="text-align: center; margin-bottom: 8px;">
-          <h2 style="font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 4px;">
+        <div style="text-align: center; margin-bottom: 6px;">
+          <h2 style="font-size: clamp(20px, 3vh, 26px); font-weight: 800; color: #fff; margin-bottom: 2px;">
             Cumplimiento de la Rúbrica de Evaluación
           </h2>
-          <p style="font-size: 13px; color: var(--text-muted);">
+          <p style="font-size: clamp(12px, 1.6vh, 13px); color: var(--text-muted);">
             Validación de los 5 criterios exigidos en la Unidad 3 (Semanas 9 y 10):
           </p>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(16, 185, 129, 0.06); border: 1px solid var(--emerald-border); border-radius: 8px; font-size: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(16, 185, 129, 0.06); border: 1px solid var(--emerald-border); border-radius: 8px; font-size: clamp(11px, 1.5vh, 12.5px);">
             <span>✅ <strong>1. Arquitectura Distribuida:</strong> API REST y Worker OCR desacoplados mediante colas PostgreSQL.</span>
             <span class="tag tag-emerald">CUMPLIDO</span>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(16, 185, 129, 0.06); border: 1px solid var(--emerald-border); border-radius: 8px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(16, 185, 129, 0.06); border: 1px solid var(--emerald-border); border-radius: 8px; font-size: clamp(11px, 1.5vh, 12.5px);">
             <span>✅ <strong>2. Tablas y FSM Declarativa:</strong> Reglas O(1) y autómata de estados con rechazo 409 de saltos ilegales.</span>
             <span class="tag tag-emerald">CUMPLIDO</span>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(16, 185, 129, 0.06); border: 1px solid var(--emerald-border); border-radius: 8px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(16, 185, 129, 0.06); border: 1px solid var(--emerald-border); border-radius: 8px; font-size: clamp(11px, 1.5vh, 12.5px);">
             <span>✅ <strong>3. Enlace Tardío (Late Binding):</strong> Feature flags reactivas para conmutar contingencia sin reinicio de servicio.</span>
             <span class="tag tag-emerald">CUMPLIDO</span>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(16, 185, 129, 0.06); border: 1px solid var(--emerald-border); border-radius: 8px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(16, 185, 129, 0.06); border: 1px solid var(--emerald-border); border-radius: 8px; font-size: clamp(11px, 1.5vh, 12.5px);">
             <span>✅ <strong>4. Logs con MDC y Modelo RED:</strong> Trazabilidad con AsyncLocalStorage y exportador estándar Prometheus.</span>
             <span class="tag tag-emerald">CUMPLIDO</span>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(16, 185, 129, 0.06); border: 1px solid var(--emerald-border); border-radius: 8px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(16, 185, 129, 0.06); border: 1px solid var(--emerald-border); border-radius: 8px; font-size: clamp(11px, 1.5vh, 12.5px);">
             <span>✅ <strong>5. Perfilado de Rendimiento:</strong> Benchmark y Flame Graph demostrando diagnóstico I/O-Bound en 0.06 ms.</span>
             <span class="tag tag-emerald">CUMPLIDO</span>
           </div>
